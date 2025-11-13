@@ -52,10 +52,8 @@
       </a>
       <div class="collapse" id="data-master">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"><a class="nav-link" href="{{ url('data/operator') }}">Data Operator</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url('data/pompa') }}">Data Pompa</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url('data/lokasi') }}">Data Lokasi SP</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url('data/users') }}">Data User</a></li>
         </ul>
       </div>
     </li>
@@ -68,8 +66,8 @@
       </a>
       <div class="collapse" id="user-management">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"><a class="nav-link" href="{{ url('user/add') }}">Tambah Users</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url('user/list') }}">Daftar Users</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ route('admin.users.create') }}">Tambah Users</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ route('admin.users') }}">Daftar Users</a></li>
         </ul>
       </div>
     </li>

@@ -8,6 +8,7 @@
   <div class="container-scroller">
     
     <!-- Navbar -->
+
     @include('admin.partials.navbar')
     
     <div class="container-fluid page-body-wrapper">
@@ -35,5 +36,6 @@
 
   <!-- Scripts -->
   @include('admin.partials.scripts')
+  @include('sweetalert::alert', ['cdn' => "https://cdn.jsdelivr.net/npm/sweetalert2@9"])
 </body>
 </html>

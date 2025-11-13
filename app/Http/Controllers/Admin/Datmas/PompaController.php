@@ -1,0 +1,169 @@
+<?php
+
+namespace App\Http\Controllers\Admin\Datmas;
+
+use App\Models\Pompa;
+use App\Models\Lokasi; 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
+
+class PompaController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $pompa = Pompa::with(['lokasi:id,kodesp,namasp']) 
+            ->select('id', 'kodepompa', 'jenispompa', 'kapasitas', 'lokasi_id', 'status')
+            ->latest()
+            ->paginate(10);
+            
+        $lokasi = Lokasi::select('id', 'kodesp', 'namasp')
+            ->orderBy('kodesp', 'asc')
+            ->get();
+            
+        return view('admin.pages.datmas.pompa.index', compact('pompa', 'lokasi'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $validateData = $request->validate([
+                'kodepompa' => 'required|string|max:50|unique:pompa,kodepompa',
+                'jenispompa' => 'required|string|max:100',
+                'kapasitas' => 'nullable|string|max:50', 
+                'lokasi_id' => 'required|exists:lokasisp,id',
+                'status' => 'required|in:aktif,nonaktif', 
+            ], [
+                'kodepompa.required' => 'Kode pompa wajib diisi.',
+                'kodepompa.unique' => 'Kode pompa sudah digunakan.',
+                'kodepompa.max' => 'Kode pompa maksimal 50 karakter.',
+                'jenispompa.required' => 'Jenis pompa wajib diisi.',
+                'jenispompa.max' => 'Jenis pompa maksimal 100 karakter.',
+                'kapasitas.max' => 'Kapasitas maksimal 50 karakter.',
+                'lokasi_id.required' => 'Lokasi stasiun pompa wajib dipilih.',
+                'lokasi_id.exists' => 'Lokasi stasiun pompa tidak valid.',
+                'status.required' => 'Status wajib dipilih.',
+                'status.in' => 'Status harus aktif atau nonaktif.',
+            ]);
+            
+            Pompa::create($validateData);
+            
+            DB::commit();
+            
+            $lokasi = Lokasi::find($validateData['lokasi_id']);
+            $namaLokasi = $lokasi ? $lokasi->namasp : '-';
+            
+            Alert::success('Berhasil!', 
+                'Pompa <strong>' . e($validateData['kodepompa']) . '</strong> jenis <strong>' . e($validateData['jenispompa']) . '</strong> pada lokasi <strong>' . e($namaLokasi) . '</strong> berhasil ditambahkan.'
+            )->html();
+            
+            return redirect()->route('admin.pompa');
+            
+        } catch(\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($e->errors())->withInput();
+            
+        } catch(\Throwable $e) {
+            DB::rollBack();
+            \Log::error("Gagal Insert Pompa: " . $e->getMessage());
+            Alert::error('Gagal!', 'Terjadi kesalahan saat menambahkan pompa: ' . $e->getMessage());
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Pompa $pompa)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $validateData = $request->validate([
+                'kodepompa' => 'required|string|max:50|unique:pompa,kodepompa,' . $pompa->id,
+                'jenispompa' => 'required|string|max:100',
+                'kapasitas' => 'nullable|string|max:50',
+                'lokasi_id' => 'required|exists:lokasisp,id',
+                'status' => 'required|in:aktif,nonaktif',
+            ], [
+                'kodepompa.required' => 'Kode pompa wajib diisi.',
+                'kodepompa.unique' => 'Kode pompa sudah digunakan.',
+                'kodepompa.max' => 'Kode pompa maksimal 50 karakter.',
+                'jenispompa.required' => 'Jenis pompa wajib diisi.',
+                'jenispompa.max' => 'Jenis pompa maksimal 100 karakter.',
+                'kapasitas.max' => 'Kapasitas maksimal 50 karakter.',
+                'lokasi_id.required' => 'Lokasi stasiun pompa wajib dipilih.',
+                'lokasi_id.exists' => 'Lokasi stasiun pompa tidak valid.',
+                'status.required' => 'Status wajib dipilih.',
+                'status.in' => 'Status harus aktif atau nonaktif.',
+            ]);
+            
+            $pompa->update($validateData);
+            
+            DB::commit();
+            
+            $lokasi = Lokasi::find($validateData['lokasi_id']);
+            $namaLokasi = $lokasi ? $lokasi->namasp : '-';
+            
+            Alert::success('Berhasil!', 
+                'Data pompa <strong>' . e($pompa->kodepompa) . '</strong> pada lokasi <strong>' . e($namaLokasi) . '</strong> berhasil diperbarui.'
+            )->html();
+            
+            return redirect()->route('admin.pompa');
+            
+        } catch(\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            
+            // Simpan data pompa yang sedang diedit untuk auto-show modal
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with([
+                    'edited_pompa_id' => $pompa->id,
+                    'edited_pompa' => $pompa // Kirim data lengkap
+                ]);
+            
+        } catch(\Throwable $e) {
+            DB::rollBack();
+            \Log::error("Gagal Update Pompa: " . $e->getMessage());
+            Alert::error('Gagal!', 'Terjadi kesalahan saat memperbarui pompa: ' . $e->getMessage());
+            return redirect()->back()->withInput();
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Pompa $pompa)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $kodepompa = $pompa->kodepompa;
+            
+            // Hapus data
+            $pompa->delete();
+            
+            DB::commit();
+
+            Alert::success('Berhasil!', 'Data pompa <strong>' . e($kodepompa) . '</strong> berhasil dihapus.')->html();
+            
+            return redirect()->route('admin.pompa');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Log::error("Gagal Delete Pompa: " . $e->getMessage());
+            Alert::error('Gagal!', 'Terjadi kesalahan saat menghapus pompa: ' . $e->getMessage());
+            return redirect()->back();
+        }
+    }
+}

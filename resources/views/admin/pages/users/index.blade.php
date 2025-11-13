@@ -2,9 +2,64 @@
 
 @section('title', 'Users')
 
+@push('styles')
+<style>
+.modal .input-group .toggle-password {
+    border: 1px solid #ced4da;
+    border-left: none;
+    background-color: #fff;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 45px;
+}
+
+.modal .input-group .toggle-password:hover {
+    background-color: #f8f9fa;
+}
+
+.modal .input-group .toggle-password:focus,
+.modal .input-group .toggle-password:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: #ced4da;
+}
+
+/* Style untuk ikon mata di modal */
+.modal .toggle-password i {
+    font-size: 18px;
+    color: #6c757d;
+    line-height: 1;
+    display: inline-block;
+    transition: color 0.2s ease;
+}
+
+.modal .toggle-password:hover i {
+    color: #495057;
+}
+
+/* Pastikan input dan button memiliki tinggi yang sama */
+.modal .input-group .form-control {
+    border-right: none;
+}
+
+.modal .input-group .form-control:focus {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
+.modal .input-group .form-control:focus + .toggle-password {
+    border-color: #80bdff;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="page-header">
-    <h3 class="page-title mb-2">Daftar Users</h3>
+    <h3 class="page-title">Daftar Users</h3>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('dashboard') }}">Dashboard</a></li>
@@ -14,7 +69,7 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-12 grid-margin stretch-card">
+    <div class="col-lg-12 grid-margin stretch-card px-3 py-4">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -22,7 +77,9 @@
                         <h4 class="card-title mb-0">Data Users</h4>
                         <p class="card-description mb-0">Kelola data pengguna sistem E-PumpLog</p>
                     </div>
-                    {{-- TOMBOL TAMBAH USER DIHAPUS DARI SINI --}}
+                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
+                        <i class="ti-plus me-1"></i> Tambah User Baru
+                    </a>
                 </div>
 
                 {{-- Filter Section --}}
@@ -30,16 +87,16 @@
                     <div class="col-md-3">
                         <select class="form-select" id="filterRole">
                             <option value="">Semua Role</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Supervisor">Supervisor</option>
-                            <option value="Operator">Operator</option>
+                            <option value="manager">Manager</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="operator">Operator</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="filterStatus">
                             <option value="">Semua Status</option>
-                            <option value="Active">Aktif</option>
-                            <option value="Inactive">Nonaktif</option>
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
                         </select>
                     </div>
                     <div class="col-md-6">
@@ -62,222 +119,140 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Example Data - Replace with @foreach($users as $user) --}}
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <img src="{{ asset('images/faces/face1.jpg') }}" class="me-2" alt="image" style="width: 30px; height: 30px; border-radius: 50%;">
-                                    John Doe
-                                </td>
-                                <td>john.doe@epumplog.com</td>
-                                <td>johndoe</td>
-                                <td><label class="badge badge-danger">Admin</label></td>
-                                <td><label class="badge badge-success">Aktif</label></td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-info btn-icon" title="Detail">
-                                        <i class="ti-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning btn-icon" title="Edit" data-bs-toggle="modal" data-bs-target="#editUserModal">
-                                        <i class="ti-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger btn-icon" title="Hapus" onclick="confirmDelete(1)">
-                                        <i class="ti-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>
-                                    <img src="{{ asset('images/faces/face2.jpg') }}" class="me-2" alt="image" style="width: 30px; height: 30px; border-radius: 50%;">
-                                    Sarah Smith
-                                </td>
-                                <td>sarah.smith@epumplog.com</td>
-                                <td>sarahsmith</td>
-                                <td><label class="badge badge-primary">Supervisor</label></td>
-                                <td><label class="badge badge-success">Aktif</label></td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-info btn-icon" title="Detail">
-                                        <i class="ti-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning btn-icon" title="Edit">
-                                        <i class="ti-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger btn-icon" title="Hapus" onclick="confirmDelete(2)">
-                                        <i class="ti-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>
-                                    <img src="{{ asset('images/faces/face3.jpg') }}" class="me-2" alt="image" style="width: 30px; height: 30px; border-radius: 50%;">
-                                    Mike Johnson
-                                </td>
-                                <td>mike.johnson@epumplog.com</td>
-                                <td>mikejohnson</td>
-                                <td><label class="badge badge-info">Operator</label></td>
-                                <td><label class="badge badge-success">Aktif</label></td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-info btn-icon" title="Detail">
-                                        <i class="ti-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning btn-icon" title="Edit">
-                                        <i class="ti-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger btn-icon" title="Hapus" onclick="confirmDelete(3)">
-                                        <i class="ti-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>
-                                    <img src="{{ asset('images/faces/face4.jpg') }}" class="me-2" alt="image" style="width: 30px; height: 30px; border-radius: 50%;">
-                                    Emily Brown
-                                </td>
-                                <td>emily.brown@epumplog.com</td>
-                                <td>emilybrown</td>
-                                <td><label class="badge badge-info">Operator</label></td>
-                                <td><label class="badge badge-warning">Nonaktif</label></td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-info btn-icon" title="Detail">
-                                        <i class="ti-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning btn-icon" title="Edit">
-                                        <i class="ti-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger btn-icon" title="Hapus" onclick="confirmDelete(4)">
-                                        <i class="ti-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>
-                                    <img src="{{ asset('images/faces/face5.jpg') }}" class="me-2" alt="image" style="width: 30px; height: 30px; border-radius: 50%;">
-                                    David Wilson
-                                </td>
-                                <td>david.wilson@epumplog.com</td>
-                                <td>davidwilson</td>
-                                <td><label class="badge badge-primary">Supervisor</label></td>
-                                <td><label class="badge badge-success">Aktif</label></td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-info btn-icon" title="Detail">
-                                        <i class="ti-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-warning btn-icon" title="Edit">
-                                        <i class="ti-pencil"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger btn-icon" title="Hapus" onclick="confirmDelete(5)">
-                                        <i class="ti-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                            @forelse ($user as $index => $item)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>
+                                        <img src="{{ asset($item->avatar ?? 'images/faces/default.jpg') }}" 
+                                             class="me-2" alt="image" 
+                                             style="width: 30px; height: 30px; border-radius: 50%;">
+                                        {{ $item->name }}
+                                    </td>
+                                    <td>{{ $item->email }}</td>
+                                    <td>{{ explode('@', $item->email)[0] }}</td>
+                                    <td>
+                                        @php
+                                            $roleClass = match ($item->role) {
+                                                'admin' => 'badge-danger',
+                                                'supervisor' => 'badge-primary',
+                                                'operator' => 'badge-info',
+                                                'manager' => 'badge-warning',
+                                                default => 'badge-secondary',
+                                            };
+                                        @endphp
+                                        <label class="badge {{ $roleClass }}">{{ ucfirst($item->role) }}</label>
+                                    </td>
+                                    <td>
+                                        @if ($item->is_active)
+                                            <label class="badge badge-success">Aktif</label>
+                                        @else
+                                            <label class="badge badge-warning">Nonaktif</label>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="" class="btn btn-sm btn-info btn-icon" title="Detail">
+                                            <i class="ti-eye"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-warning btn-icon btn-edit-user" 
+                                            title="Edit" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editUserModal" 
+                                            data-id="{{ $item->id }}"
+                                            data-name="{{ $item->name }}"
+                                            data-email="{{ $item->email }}"
+                                            data-is-active="{{ $item->is_active }}"
+                                            data-role="{{ $item->role }}">
+                                            <i class="ti-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger btn-icon" title="Hapus" onclick="confirmDelete('{{ $item->id }}')">
+                                            <i class="ti-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center">Tidak ada data user yang tersedia.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                    <p class="mb-0 text-muted">Menampilkan 1 - 5 dari 5 data</p>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
+                    @if ($user instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                        <p class="mb-0 text-muted">Menampilkan {{ $user->firstItem() }} - {{ $user->lastItem() }} dari {{ $user->total() }} data</p>
+                        <nav aria-label="Page navigation">
+                            {{ $user->links('pagination::bootstrap-4') }}
+                        </nav>
+                    @else
+                        <p class="mb-0 text-muted">Menampilkan {{ count($user) }} data</p>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- MODAL ADD USER DIHAPUS DARI SINI --}}
-
-{{-- Modal Edit User (Tetap dipertahankan) --}}
+{{-- Modal Edit User --}}
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="editUserModalLabel">
-                    <i class="ti-pencil me-2"></i>Edit User
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editUserForm">
+            <form id="editUserForm" method="POST">
+                @csrf
+                @method('PUT')
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="name" value="John Doe" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="username" value="johndoe" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="email" value="john.doe@epumplog.com" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">No. Telepon</label>
-                            <input type="text" class="form-control" name="phone" value="08123456789">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Password Baru</label>
-                            <input type="password" class="form-control" name="password" placeholder="Kosongkan jika tidak ingin mengubah">
-                            <small class="text-muted">Minimal 8 karakter</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Konfirmasi Password</label>
-                            <input type="password" class="form-control" name="password_confirmation" placeholder="Ulangi password baru">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Role <span class="text-danger">*</span></label>
-                            <select class="form-select" name="role" required>
-                                <option value="Admin" selected>Admin</option>
-                                <option value="Supervisor">Supervisor</option>
-                                <option value="Operator">Operator</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-select" name="status" required>
-                                <option value="Active" selected>Aktif</option>
-                                <option value="Inactive">Nonaktif</option>
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Alamat</label>
-                        <textarea class="form-control" name="address" rows="3">Jl. Contoh No. 123, Jakarta</textarea>
+                        <label for="edit_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit_email" name="email" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Foto Profile</label>
-                        <input type="file" class="form-control" name="photo" accept="image/*">
-                        <small class="text-muted">Format: JPG, PNG. Max: 2MB. Kosongkan jika tidak ingin mengubah</small>
+                        <label for="edit_role" class="form-label">Role</label>
+                        <select class="form-select" id="edit_role" name="role" required>
+                            <option value="">Pilih Role</option>
+                            <option value="manager">Manager</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="operator">Operator</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_status" class="form-label">Status</label>
+                        <select class="form-select" id="edit_status" name="is_active" required>
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_password" class="form-label">Password Baru (Opsional)</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="edit_password" name="password" placeholder="Kosongkan jika tidak ingin mengubah password">
+                            <button class="btn toggle-password" type="button" data-target="edit_password" tabindex="-1">
+                                <i class="ti-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">Minimal 8 karakter</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_password_confirmation" class="form-label">Konfirmasi Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="edit_password_confirmation" name="password_confirmation" placeholder="Ulangi password baru">
+                            <button class="btn toggle-password" type="button" data-target="edit_password_confirmation" tabindex="-1">
+                                <i class="ti-eye"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="ti-close me-1"></i>Batal
-                    </button>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="ti-save me-1"></i>Update User
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -288,30 +263,99 @@
 
 @push('scripts')
 <script>
-    // Edit User Form Submit
-    document.getElementById('editUserForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    // 1. Logic untuk mengisi data di Modal Edit
+    document.addEventListener('DOMContentLoaded', function() {
+        const editUserModal = document.getElementById('editUserModal');
+        const editUserForm = document.getElementById('editUserForm');
+        
+        editUserModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            
+            // Ambil data dari atribut data-*
+            const userId = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const email = button.getAttribute('data-email');
+            const role = button.getAttribute('data-role');
+            const isActive = button.getAttribute('data-is-active');
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Data user berhasil diupdate',
-            showConfirmButton: false,
-            timer: 1500
-        }).then(() => {
-            const editModalEl = document.getElementById('editUserModal');
-            if (editModalEl) {
-                const modalInstance = bootstrap.Modal.getInstance(editModalEl);
-                if (modalInstance) {
-                    modalInstance.hide();
-                } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    new bootstrap.Modal(editModalEl).hide();
-                }
-            }
+            // Set Action Form dengan route yang benar
+            const actionRoute = '{{ route("admin.users.update", ":id") }}'.replace(':id', userId);
+            editUserForm.setAttribute('action', actionRoute);
+
+            // Isi field di Modal
+            document.getElementById('edit_name').value = name;
+            document.getElementById('edit_email').value = email;
+            document.getElementById('edit_role').value = role;
+            document.getElementById('edit_status').value = isActive;
+            
+            // Reset password fields dan icon
+            const passwordInput = document.getElementById('edit_password');
+            const confirmInput = document.getElementById('edit_password_confirmation');
+            passwordInput.value = '';
+            confirmInput.value = '';
+            passwordInput.setAttribute('type', 'password');
+            confirmInput.setAttribute('type', 'password');
+            
+            // Reset icon ke ti-eye
+            document.querySelectorAll('#editUserModal .toggle-password i').forEach(icon => {
+                icon.className = 'ti-eye';
+            });
         });
+
+        // 2. Toggle Password Visibility (untuk semua toggle button)
+        const toggleButtons = document.querySelectorAll('.toggle-password');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+
+                if (passwordInput && icon) {
+                    // Toggle tipe input
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
+                    
+                    if (isPassword) {
+                        passwordInput.setAttribute('type', 'text');
+                        icon.className = 'ti-eye-off';
+                    } else {
+                        passwordInput.setAttribute('type', 'password');
+                        icon.className = 'ti-eye';
+                    }
+                }
+            });
+
+            // Prevent button dari submit form
+            button.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+            });
+        });
+
+        // 3. Validasi konfirmasi password di modal
+        const editPassword = document.getElementById('edit_password');
+        const editPasswordConfirm = document.getElementById('edit_password_confirmation');
+        
+        if (editPasswordConfirm && editPassword) {
+            editPasswordConfirm.addEventListener('input', function() {
+                if (editPassword.value !== '' && this.value !== editPassword.value) {
+                    this.setCustomValidity('Password tidak cocok');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+            
+            editPassword.addEventListener('input', function() {
+                if (editPasswordConfirm.value !== '') {
+                    editPasswordConfirm.dispatchEvent(new Event('input'));
+                }
+            });
+        }
     });
 
-    // Delete User
+    // 4. Delete User
     function confirmDelete(userId) {
         Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -324,46 +368,57 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Terhapus!',
-                    text: 'User berhasil dihapus',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                // Tambahkan logika penghapusan data di sini
+                const form = document.createElement('form');
+                form.action = '{{ route("admin.users.destroy", ":id") }}'.replace(':id', userId);
+                form.method = 'POST';
+                form.style.display = 'none';
+
+                const csrfInput = document.createElement('input');
+                csrfInput.setAttribute('type', 'hidden');
+                csrfInput.setAttribute('name', '_token');
+                csrfInput.setAttribute('value', '{{ csrf_token() }}');
+                form.appendChild(csrfInput);
+
+                const methodInput = document.createElement('input');
+                methodInput.setAttribute('type', 'hidden');
+                methodInput.setAttribute('name', '_method');
+                methodInput.setAttribute('value', 'DELETE');
+                form.appendChild(methodInput);
+
+                document.body.appendChild(form);
+                form.submit();
             }
         });
     }
 
-    // Search functionality
-    document.getElementById('searchUser').addEventListener('keyup', function() {
-        const searchValue = this.value.toLowerCase();
-        const tableRows = document.querySelectorAll('tbody tr');
-        
-        tableRows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
-        });
-    });
+    // 5. Search and Filter
+    document.getElementById('searchUser').addEventListener('keyup', searchTable);
+    document.getElementById('filterRole').addEventListener('change', searchTable);
+    document.getElementById('filterStatus').addEventListener('change', searchTable);
 
-    // Filter by Role & Status
-    document.getElementById('filterRole').addEventListener('change', filterTable);
-    document.getElementById('filterStatus').addEventListener('change', filterTable);
-
-    function filterTable() {
-        const roleFilter = document.getElementById('filterRole').value;
+    function searchTable() {
+        const searchValue = document.getElementById('searchUser').value.toLowerCase();
+        const roleFilter = document.getElementById('filterRole').value.toLowerCase();
         const statusFilter = document.getElementById('filterStatus').value;
+        
         const tableRows = document.querySelectorAll('tbody tr');
         
         tableRows.forEach(row => {
-            const role = row.querySelector('td:nth-child(5)').textContent.trim();
-            const status = row.querySelector('td:nth-child(6)').textContent.trim();
+            // Skip empty row
+            if (row.querySelector('td[colspan]')) return;
             
-            const roleMatch = !roleFilter || role.toLowerCase() === roleFilter.toLowerCase();
-            const statusMatch = !statusFilter || status.toLowerCase() === statusFilter.toLowerCase();
+            const name = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+            const email = row.querySelector('td:nth-child(3)').textContent.trim().toLowerCase();
+            const username = row.querySelector('td:nth-child(4)').textContent.trim().toLowerCase();
+            const rowRoleText = row.querySelector('td:nth-child(5) label').textContent.trim().toLowerCase(); 
+            const rowStatusText = row.querySelector('td:nth-child(6) label').textContent.trim();
+            const rowStatusValue = (rowStatusText === 'Aktif') ? '1' : '0';
+
+            const textMatch = name.includes(searchValue) || email.includes(searchValue) || username.includes(searchValue);
+            const roleMatch = !roleFilter || rowRoleText === roleFilter;
+            const statusMatch = !statusFilter || rowStatusValue === statusFilter;
             
-            row.style.display = (roleMatch && statusMatch) ? '' : 'none';
+            row.style.display = (textMatch && roleMatch && statusMatch) ? '' : 'none';
         });
     }
 </script>

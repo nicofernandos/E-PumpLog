@@ -1,7 +1,7 @@
 <!-- Required meta tags -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>@yield('title', 'Star Admin2')</title>
+<title>@yield('title', 'E-PumpLog')</title>
 
 <!-- plugins:css -->
 <link rel="stylesheet" href="{{ asset('assets/vendors/feather/feather.css') }}">
