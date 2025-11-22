@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Datmas\LokasiController;
 use App\Http\Controllers\Admin\Datmas\PompaController;
 use App\Http\Controllers\Admin\Users\UserController;
+use App\Http\Controllers\User\DashboardController as UsersDashbooardController; 
 
 Route::get('/', function () {
     return view('welcome');
@@ -48,3 +49,11 @@ Route::prefix('admin')->as('admin.')->group(function () {
     });
 
 }); 
+
+Route::prefix('user')->as('user.')->group(function (){
+    // User Routes can be defined here
+
+    Route::prefix('dashboard')->name('dashboard.')->group(function (){
+        Route::get('/', [UsersDashbooardController::class, 'index'])->name('index');
+    });
+});
