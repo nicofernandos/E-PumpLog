@@ -21,5 +21,6 @@
 <!-- Favicon -->
 <link rel="shortcut icon" href="{{ asset('images/logo/av.png') }}" />
 
+
 <!-- Additional CSS -->
 @stack('styles')

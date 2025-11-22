@@ -9,6 +9,9 @@ class ReportController extends Controller
 {
     public function index()
     {
-        return view('user.pages.report.index');
+        $data = [
+            'title'=> 'E-PumpLog | Laporan Harian Injeksi Pompa'
+        ];
+        return view('user.pages.report.index',compact('data'));
     }
 }
