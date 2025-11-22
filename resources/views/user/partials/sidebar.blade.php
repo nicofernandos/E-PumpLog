@@ -11,10 +11,17 @@
 
     <!-- PENGINPUTAN LAPORAN (CORE FUNCTION) -->
     <li class="nav-item nav-category">Penginputan Data</li>
-    <li class="nav-item {{ request()->routeIs('user.laporan.create') ? 'active' : '' }}">
-      <a class="nav-link" href="">
+    <li class="nav-item {{ request()->routeIs('user.report.index') ? 'active' : '' }}">
+      <a class="nav-link" href="{{ route('user.report.index') }}">
         <i class="mdi mdi-pencil-box-outline menu-icon"></i>
         <span class="menu-title">Input Laporan Harian</span>
+      </a>
+    </li>
+    
+    <li class="nav-item {{ request()->routeIs('user.dailyreport.index') ? 'active' : '' }}">
+      <a class="nav-link" href="{{ route('user.dailyreport.index') }}">
+        <i class="mdi mdi-pencil-lock-outline menu-icon"></i>
+        <span class="menu-title">Draft Laporan Harian</span>
       </a>
     </li>
 

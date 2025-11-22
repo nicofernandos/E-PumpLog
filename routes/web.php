@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\Datmas\LokasiController;
 use App\Http\Controllers\Admin\Datmas\PompaController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\User\DashboardController as UsersDashbooardController; 
+use App\Http\Controllers\User\ReportController as UserReportController;
+use App\Http\Controllers\User\DailyReportController as UserDailyReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -55,5 +57,13 @@ Route::prefix('user')->as('user.')->group(function (){
 
     Route::prefix('dashboard')->name('dashboard.')->group(function (){
         Route::get('/', [UsersDashbooardController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('report')->name('report.')->group(function (){
+        Route::get('/', [UserReportController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('dailyreport')->name('dailyreport.')->group(function (){
+        Route::get('/',[UserDailyReportController::class,'index'])->name('index');
     });
 });
