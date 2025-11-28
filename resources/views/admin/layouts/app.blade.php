@@ -13,9 +13,6 @@
     
     <div class="container-fluid page-body-wrapper">
       
-      <!-- Settings Panel -->
-      @include('admin.partials.settings')
-      
       <!-- Sidebar -->
       @include('admin.partials.sidebar')
       
