@@ -143,11 +143,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="keterangan" class="form-label">Keterangan</label>
-                        <textarea class="form-control @error('keterangan') is-invalid @enderror" 
-                                  id="keterangan" name="keterangan" 
-                                  rows="3" 
-                                  placeholder="Contoh: Wilayah Limau Field Area 1">{{ old('keterangan') }}</textarea>
-                        @error('keterangan')
+                        <input type="text"
+                         class="form-control @error('keterangan') is-invalid @enderror"
+                            id="keterangan" name="keterangan" placeholder="Contoh : Stasiun Pompa 1"
+                            value="{{ old('keterangan') }}">
+                        @error('keterangan')   
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
@@ -156,7 +156,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="ti-save me-1"></i> Simpan
                     </button>
@@ -190,12 +190,12 @@
                     </div>
                     <div class="mb-3">
                         <label for="edit_keterangan" class="form-label">Keterangan</label>
-                        <textarea class="form-control" id="edit_keterangan" name="keterangan" rows="3" placeholder="Contoh: Wilayah Limau Field Area 1"></textarea>
+                        <input type="text" class="form-control" id="edit_keterangan" name="keterangan" placeholder="Contoh: Wilayah Limau Field Area 1">
                         <small class="form-text text-muted">Deskripsi lokasi atau area stasiun pompa</small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="ti-save me-1"></i> Simpan Perubahan
                     </button>
@@ -260,8 +260,8 @@
             text: "Data lokasi SP akan dihapus permanen!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#0d6efd',
             confirmButtonText: 'Ya, Hapus!',
             cancelButtonText: 'Batal'
         }).then((result) => {

@@ -66,7 +66,7 @@ class PompaController extends Controller
                 'Pompa <strong>' . e($validateData['kodepompa']) . '</strong> jenis <strong>' . e($validateData['jenispompa']) . '</strong> pada lokasi <strong>' . e($namaLokasi) . '</strong> berhasil ditambahkan.'
             )->html();
             
-            return redirect()->route('admin.pompa');
+            return redirect()->route('admin.pompa.index');
             
         } catch(\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -118,7 +118,7 @@ class PompaController extends Controller
                 'Data pompa <strong>' . e($pompa->kodepompa) . '</strong> pada lokasi <strong>' . e($namaLokasi) . '</strong> berhasil diperbarui.'
             )->html();
             
-            return redirect()->route('admin.pompa');
+            return redirect()->route('admin.pompa.index');
             
         } catch(\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -157,7 +157,7 @@ class PompaController extends Controller
 
             Alert::success('Berhasil!', 'Data pompa <strong>' . e($kodepompa) . '</strong> berhasil dihapus.')->html();
             
-            return redirect()->route('admin.pompa');
+            return redirect()->route('admin.pompa.index');
 
         } catch (\Throwable $e) {
             DB::rollBack();

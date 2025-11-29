@@ -31,7 +31,7 @@ class LokasiController extends Controller
 
             DB::commit();
             Alert::success('Success', 'Berhasil Menambahkan Lokasi SP: ' . $validateData['namasp']);
-            return redirect()->route('admin.lokasi');
+            return redirect()->route('admin.lokasi.index');
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack(); 
             return redirect()->back()->withErrors($e->errors())->withInput();
