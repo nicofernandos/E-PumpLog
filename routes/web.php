@@ -5,17 +5,19 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Datmas\LokasiController;
 use App\Http\Controllers\Admin\Datmas\PompaController;
 use App\Http\Controllers\Admin\Users\UserController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\User\DashboardController as UsersDashbooardController; 
 use App\Http\Controllers\User\ReportController as UserReportController;
 use App\Http\Controllers\User\DailyReportController as UserDailyReportController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/login',function(){
     return view('auth.login');
 });
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 Route::prefix('admin')->as('admin.')->group(function () {
     
