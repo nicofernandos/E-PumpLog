@@ -14,19 +14,19 @@ class LaporanHarian extends Model
 
     protected $fillable = [
         'user_id',
-        'lokasisp_id'
+        'lokasisp_id',
         'pompa_id',
         'tanggal',
         'injeksi_ke',
         'facility',
         'total_cumulative',
-        'operation_siang_id',
-        'operation_malam_id',
+        'operator_siang_id',
+        'operator_malam_id',
         'keterangan',
         'status'
     ];
 
-    $protected $casts = [
+    protected $casts = [
         'tanggal' => 'date',
     ];
 
@@ -51,7 +51,7 @@ class LaporanHarian extends Model
     }
 
     public function detilJam(){
-        return $this->hasMany(LaporanDetilJam::class,'Laporan_id');
+        return $this->hasMany(LaporanDetilJam::class,'laporan_id');
     }
 
     public function runningHours(){

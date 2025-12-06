@@ -30,7 +30,7 @@
     <h3 class="page-title mb-2">Draft Laporan Harian</h3>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('user.dashboard.index') }}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Draft Laporan</li>
         </ol>
     </nav>
@@ -100,9 +100,9 @@
                         <h4 class="card-title mb-0">Daftar Draft Laporan Harian</h4>
                         <p class="card-description mb-0">Laporan harian injeksi pompa per jam yang masih draft</p>
                     </div>
-                    <a href="#" class="btn btn-primary btn-sm">
+                    <a href="{{ route('user.report.index') }}" class="btn btn-primary btn-sm">
                         <i class="mdi mdi-plus me-1"></i> Input Laporan Baru
-                    </a>
+                    </a>    
                 </div>
 
                 {{-- Filter Section --}}
@@ -156,7 +156,7 @@
                                         {{ $draft->pompa->lokasi->namasp ?? '-' }}
                                     </td>
                                     <td>
-                                        <strong>{{ $draft->injector_well ?? '-' }}</strong>
+                                        <strong>{{ $draft->injeksi_ke ?? '-' }}</strong>
                                     </td>
                                     <td>
                                         <span class="badge badge-primary hourly-badge">
@@ -164,13 +164,13 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <strong>{{ number_format($draft->total_comulative ?? 0, 2) }}</strong>
+                                        <strong>{{ number_format($draft->total_cumulative ?? 0, 2) }}</strong>
                                     </td>
                                     <td class="text-center">
                                         <span class="badge badge-draft">Draft</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="#" 
+                                        <a href="{{ route('user.dailyreport.edit', $draft->id) }}" 
                                            class="btn btn-sm btn-warning btn-icon" 
                                            title="Lanjutkan Edit">
                                             <i class="mdi mdi-pencil"></i>
@@ -198,7 +198,7 @@
                                             <i class="mdi mdi-file-document-edit-outline" style="font-size: 64px; color: #ccc;"></i>
                                             <h5 class="text-muted mt-3 mb-2">Belum Ada Draft Laporan</h5>
                                             <p class="text-muted">Mulai input laporan harian injeksi pompa per jam</p>
-                                            <a href="#" class="btn btn-primary mt-2">
+                                            <a href="{{ route('user.report.index') }}" class="btn btn-primary mt-2">
                                                 <i class="mdi mdi-plus me-1"></i> Input Laporan Baru
                                             </a>
                                         </div>
@@ -303,7 +303,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
-                form.action = '#';
+                form.action = `/user/dailyreport/${draftId}/submit`;
                 form.method = 'POST';
                 form.style.display = 'none';
 
@@ -339,7 +339,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
-                form.action = '#';
+                form.action = `/user/dailyreport/${draftId}`;
                 form.method = 'POST';
                 form.style.display = 'none';
 
