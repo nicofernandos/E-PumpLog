@@ -84,7 +84,7 @@
                     </div>
                 </div>
 
-                <form action="" method="POST" class="forms-sample">
+                <form action=" {{ route('user.report.store') }} " method="POST" class="forms-sample">
                     @csrf
 
                     {{-- Header Information --}}

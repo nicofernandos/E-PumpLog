@@ -10,14 +10,10 @@ use App\Http\Controllers\User\DashboardController as UsersDashbooardController;
 use App\Http\Controllers\User\ReportController as UserReportController;
 use App\Http\Controllers\User\DailyReportController as UserDailyReportController;
 
-Route::get('/', function () {
-    return view('auth.login');
-});
-
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 
 Route::prefix('admin')->as('admin.')->group(function () {
     
@@ -54,18 +50,23 @@ Route::prefix('admin')->as('admin.')->group(function () {
 
 }); 
 
-Route::prefix('user')->as('user.')->group(function (){
-    // User Routes can be defined here
+Route::prefix('user')->as('user.')->middleware(['auth'])->group(function () {
+    
+    // Dashboard
+    Route::get('/dashboard', [UsersDashboardController::class, 'index'])->name('dashboard.index');
 
-    Route::prefix('dashboard')->name('dashboard.')->group(function (){
-        Route::get('/', [UsersDashbooardController::class, 'index'])->name('index');
-    });
-
-    Route::prefix('report')->name('report.')->group(function (){
+    // ✅ REPORT (Form Input Laporan)
+    Route::prefix('report')->name('report.')->group(function () {
         Route::get('/', [UserReportController::class, 'index'])->name('index');
+        Route::post('/', [UserReportController::class, 'store'])->name('store');
     });
 
-    Route::prefix('dailyreport')->name('dailyreport.')->group(function (){
-        Route::get('/',[UserDailyReportController::class,'index'])->name('index');
+    // ✅ DAILY REPORT (Kelola Draft)
+    Route::prefix('dailyreport')->name('dailyreport.')->group(function () {
+        Route::get('/', [UserDailyReportController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [UserDailyReportController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UserDailyReportController::class, 'update'])->name('update');
+        Route::patch('/{id}/submit', [UserDailyReportController::class, 'submitDraft'])->name('submit');
+        Route::delete('/{id}', [UserDailyReportController::class, 'destroy'])->name('destroy');
     });
 });
