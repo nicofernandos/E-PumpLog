@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Datmas\LokasiController;
 use App\Http\Controllers\Admin\Datmas\PompaController;
+use App\Http\Controllers\Admin\Report\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\User\DashboardController as UsersDashbooardController; 
+use App\Http\Controllers\User\DashboardController as UsersDashboardController; 
 use App\Http\Controllers\User\ReportController as UserReportController;
 use App\Http\Controllers\User\DailyReportController as UserDailyReportController;
 
@@ -46,6 +47,10 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::post('/store', [PompaController::class, 'store'])->name('store');
         Route::put('/{pompa}', [PompaController::class, 'update'])->name('update');
         Route::delete('/{pompa}', [PompaController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/',[AdminReportController::class,'index'])->name('index');
     });
 
 }); 

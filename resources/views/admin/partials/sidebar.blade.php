@@ -18,7 +18,7 @@
       </a>
       <div class="collapse" id="laporan">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"><a class="nav-link" href="{{ url('laporan/daftar') }}">Daftar Laporan</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ route('admin.reports.index') }}">Daftar Laporan</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url('laporan/disetujui') }}">Laporan Disetujui</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url('laporan/revisi') }}">Laporan Revisi</a></li>
         </ul>
