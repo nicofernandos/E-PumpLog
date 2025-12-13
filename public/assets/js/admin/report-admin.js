@@ -1,6 +1,13 @@
 // File: Script untuk resources/views/admin/reports/index.blade.php (dalam @push('scripts'))
 
 document.addEventListener("DOMContentLoaded", function () {
+    const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.content || "";
+
+    if (!csrfToken) {
+        console.error("CSRF token not found in meta tag.");
+    }
+
     // ===========================
     // 1. FILTER & SEARCH FUNCTIONS
     // ===========================
@@ -136,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
             showLoadingState();
 
             // Fetch report detail via AJAX
-            fetch(`/admin/reports/${reportId}/detail`)
+            fetch(`/admin/reports/${reportId}`)
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Network response was not ok");

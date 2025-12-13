@@ -52,4 +52,37 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+     public function laporanHarian()
+    {
+        return $this->hasMany(LaporanHarian::class, 'user_id');
+    }
+     
+    public function approvedReports()
+    {
+        return $this->hasMany(LaporanHarian::class, 'approved_by');
+    }
+    
+    public function reports()
+    {
+        return $this->hasMany(LaporanHarian::class,'approved_by');
+        
+    }
+
+    public function RejectedReports()
+    {
+        return $this->hasMany(LaporanHarian::class,'rejected_by');
+    }
+
+    public function operatorSiangReports()
+    {
+        return $this->hasMany(LaporanHarian::class,'operator_siang_id');
+    }
+
+    public function operatorMalamReports()
+    {
+        return $this->hasMany(LaporanHarian::class,'operator_malam_id');
+    }
+
+
 }

@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\LaporanDetilJam;
 use App\Models\LaporanHarian;
 use App\Models\Lokasi;
-use app\Models\User;
+use App\Models\User;
 use Carbon\Carbon;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
-    {
+    {   
         // Get filter inputs
         $search = $request->input('search');
         $dateFrom = $request->input('date_from');
@@ -29,7 +29,7 @@ class ReportController extends Controller
             'pompa.lokasi:id,kodesp,namasp',
             'detilJam'
         ])
-        ->whereIn('status', ['submitted', 'approved', 'rejected']); // Exclude drafts
+        ->whereIn('status', ['draft', 'finalized', 'verified','approved']); // Exclude drafts
 
         // Search filter
         if ($search) {
@@ -292,6 +292,148 @@ class ReportController extends Controller
 
         // Return empty array if parsing fails
         return [];
+    }
+
+    public function approved(Request $request)
+    {
+        // Get filter inputs
+        $search = $request->input('search');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+        $lokasiId = $request->input('lokasi_id');
+        $approvedBy = $request->input('approved_by');
+
+        // Query builder with eager loading
+        $query = LaporanHarian::with([
+            'user:id,name,email',
+            'pompa:id,kodepompa,jenispompa,lokasi_id',
+            'pompa.lokasi:id,kodesp,namasp',
+            'detilJam',
+            'approvedBy:id,name,email'
+        ])
+        ->where('status', 'approved'); // Only approved reports
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('injeksi_ke', 'like', "%{$search}%")
+                  ->orWhereHas('pompa', function($q2) use ($search) {
+                      $q2->where('kodepompa', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('pompa.lokasi', function($q3) use ($search) {
+                      $q3->where('namasp', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('user', function($q4) use ($search) {
+                      $q4->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('approvedBy', function($q5) use ($search) {
+                      $q5->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Apply date range filter
+        if ($dateFrom && $dateTo) {
+            $query->whereBetween('tanggal', [$dateFrom, $dateTo]);
+        } elseif ($dateFrom) {
+            $query->whereDate('tanggal', '>=', $dateFrom);
+        } elseif ($dateTo) {
+            $query->whereDate('tanggal', '<=', $dateTo);
+        }
+
+        // Apply lokasi filter
+        if ($lokasiId) {
+            $query->where('lokasisp_id', $lokasiId);
+        }
+
+        // Apply approved_by filter
+        if ($approvedBy) {
+            $query->where('approved_by', $approvedBy);
+        }
+
+        // Order by approval date (latest first)
+        $query->orderBy('approved_at', 'desc')
+              ->orderBy('tanggal', 'desc');
+
+        // Paginate results
+        $reports = $query->paginate(15)->withQueryString();
+
+        // Add hourly entries count to each report
+        $reports->getCollection()->transform(function ($report) {
+            $report->hourly_entries_count = $report->detilJam->count();
+            return $report;
+        });
+
+        // Get all lokasi for filter dropdown
+        $lokasi = Lokasi::select('id', 'kodesp', 'namasp')
+                        ->orderBy('namasp')
+                        ->get();
+
+        // Get all users who have approved reports (for filter)
+        $approvers = User::whereHas('approvedReports')
+                         ->select('id', 'name')
+                         ->orderBy('name')
+                         ->get();
+
+        // Calculate statistics
+        $totalApproved = LaporanHarian::where('status', 'approved')->count();
+        
+        $approvedToday = LaporanHarian::where('status', 'approved')
+                                      ->whereDate('approved_at', Carbon::today())
+                                      ->count();
+        
+        $approvedThisMonth = LaporanHarian::where('status', 'approved')
+                                          ->whereYear('approved_at', Carbon::now()->year)
+                                          ->whereMonth('approved_at', Carbon::now()->month)
+                                          ->count();
+        
+        $totalCumulative = LaporanHarian::where('status', 'approved')
+                                        ->sum('total_cumulative');
+
+        // Title + Subtitle
+        $title = 'E-PumpLog | Laporan Disetujui';
+        $subtitle = 'Laporan Harian yang Telah Disetujui';
+
+        return view('admin.pages.report.approve', compact(
+            'reports',
+            'lokasi',
+            'approvers',
+            'totalApproved',
+            'approvedToday',
+            'approvedThisMonth',
+            'totalCumulative',
+            'title',
+            'subtitle'
+        ));
+    }
+
+    public function revokeApproval(Request $request, $id)
+    {
+        try {
+            $report = LaporanHarian::findOrFail($id);
+            
+            // Check if report is approved
+            if ($report->status !== 'approved') {
+                return redirect()->back()->with('warning', 'Laporan ini belum di-approve.');
+            }
+
+            // Revoke approval - back to submitted
+            $report->update([
+                'status' => 'submitted',
+                'approved_by' => null,
+                'approved_at' => null
+            ]);
+
+            return redirect()->back()->with('success', 'Approval berhasil dibatalkan! Laporan kembali ke status Submitted.');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal membatalkan approval: ' . $e->getMessage());
+        }
+    }
+
+    public function revisi(Request $request)
+    {
+        return view('admin.pages.report.revisi');   
     }
 
 }

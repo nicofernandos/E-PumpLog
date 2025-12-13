@@ -50,8 +50,23 @@ Route::prefix('admin')->as('admin.')->group(function () {
     });
 
     Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/',[AdminReportController::class,'index'])->name('index');
+
+        Route::get('/approved', [AdminReportController::class,'approved'])->name('approved');
+        Route::patch('/{id}/revoke-approval', [AdminReportController::class,'revokeApproval'])->name('revokeApproval');
+
+        Route::get('/revisi',[AdminReportController::class,'revisi'])->name('revisi');
+
+        Route::get('/export/excel', [AdminReportController::class,'exportExcel'])->name('export.excel');
+        Route::get('/export/pdf', [AdminReportController::class,'exportPdf'])->name('export.pdf');
+
+        Route::get('/', [AdminReportController::class,'index'])->name('index');
+        Route::get('/{id}', [AdminReportController::class, 'show'])->name('show');
+        Route::patch('/{id}/approve', [AdminReportController::class,'approve'])->name('approve');
+        Route::patch('/{id}/rejected', [AdminReportController::class,'reject'])->name('reject');
+        Route::get('/{id}/print', [AdminReportController::class,'print'])->name('print');
     });
+
+
 
 }); 
 
@@ -59,8 +74,6 @@ Route::prefix('user')->as('user.')->middleware(['auth'])->group(function () {
     
     // Dashboard
     Route::get('/dashboard', [UsersDashboardController::class, 'index'])->name('dashboard.index');
-
-    // ✅ REPORT (Form Input Laporan)
     Route::prefix('report')->name('report.')->group(function () {
         Route::get('/', [UserReportController::class, 'index'])->name('index');
         Route::post('/', [UserReportController::class, 'store'])->name('store');

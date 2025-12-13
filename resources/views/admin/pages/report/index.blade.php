@@ -584,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             showLoadingState();
             
-            fetch(`/admin/reports/${reportId}/detail`)
+            fetch(`/admin/reports/${reportId}`)
                 .then(response => response.json())
                 .then(data => populateModalData(data))
                 .catch(error => {
@@ -747,6 +747,5 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 </script>
-<script const csrfToken = ' {{ csrf_token() }}';
 <script src="{{ asset('assets/js/admin/report-admin.js') }}"></script>
 @endpush
