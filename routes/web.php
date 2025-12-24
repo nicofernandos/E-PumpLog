@@ -72,14 +72,12 @@ Route::prefix('admin')->as('admin.')->group(function () {
 
 Route::prefix('user')->as('user.')->middleware(['auth'])->group(function () {
     
-    // Dashboard
     Route::get('/dashboard', [UsersDashboardController::class, 'index'])->name('dashboard.index');
     Route::prefix('report')->name('report.')->group(function () {
         Route::get('/', [UserReportController::class, 'index'])->name('index');
         Route::post('/', [UserReportController::class, 'store'])->name('store');
     });
 
-    // ✅ DAILY REPORT (Kelola Draft)
     Route::prefix('dailyreport')->name('dailyreport.')->group(function () {
         Route::get('/', [UserDailyReportController::class, 'index'])->name('index');
         Route::get('/{id}/edit', [UserDailyReportController::class, 'edit'])->name('edit');

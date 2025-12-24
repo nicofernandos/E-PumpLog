@@ -1,8 +1,8 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
   <ul class="nav">
     <!-- Dashboard -->
-    <li class="nav-item {{ request()->is('/') ? 'active' : '' }}">
-      <a class="nav-link" href="{{ url('/') }}">
+    <li class="nav-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+      <a class="nav-link" href="{{ url('/admin/dashboard') }}">
         <i class="mdi mdi-view-dashboard menu-icon"></i>
         <span class="menu-title">Dashboard</span>
       </a>
@@ -52,8 +52,8 @@
       </a>
       <div class="collapse" id="data-master">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"><a class="nav-link" href="{{ url('data/pompa') }}">Data Pompa</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url('data/lokasi') }}">Data Lokasi SP</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url('admin/pompa') }}">Data Pompa</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url('admin/lokasi') }}">Data Lokasi SP</a></li>
         </ul>
       </div>
     </li>

@@ -115,6 +115,37 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card" style="border-left-color: #FFCE1B">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">
+                            Laporan Draft Hari Ini
+                        </h6>
+                        <h4 class="mb-0 fw-bold text-warning">{{ $reportsThisMonth ?? 0 }}</h4>
+                        <small class="text-muted"> {{ \Carbon\Carbon::now()->format('F Y') }} </small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card" style="border-left-color: #014325">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Laporan Verified Hari Ini</h6>
+                        <h4 class="mb-0 fw-bold text-info">{{ $reportsThisMonth ?? 0 }}</h4>
+                        <small class="text-muted"> {{ \Carbon\Carbon::now()->format('F Y') }} </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Main Content --}}
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
