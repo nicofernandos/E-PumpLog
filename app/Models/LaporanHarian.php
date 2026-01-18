@@ -23,7 +23,8 @@ class LaporanHarian extends Model
         'operator_siang_id',
         'operator_malam_id',
         'keterangan',
-        'status'
+        'status',
+        'is_deleted'
     ];
 
     protected $casts = [

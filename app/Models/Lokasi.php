@@ -19,6 +19,7 @@ class Lokasi extends Model
         'kodesp',
         'namasp',
         'keterangan',
+        'is_deleted',
     ];
 
     protected $casts = [

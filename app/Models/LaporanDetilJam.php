@@ -22,7 +22,8 @@ class LaporanDetilJam extends Model
         'oli_cf',
         'press_cf',
         'water_cf',
-        'freq_hz'
+        'freq_hz',
+        'is_deleted'
     ];
 
     protected $casts = [
