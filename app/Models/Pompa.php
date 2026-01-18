@@ -18,11 +18,12 @@ class Pompa extends Model
         'kapasitas',
         'lokasi_id',
         'status',
+        'is_deleted',
     ];
 
     public function lokasi(){
-        return $this->belongsTo(Lokasi::class, 'lokasi_id');
+        return $this->belongsTo(Lokasi::class, 'lokasi_id')
+                    ->where('is_deleted', 0);
     }
-    
 
 }

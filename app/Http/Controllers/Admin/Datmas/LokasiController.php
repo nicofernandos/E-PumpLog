@@ -13,6 +13,7 @@ class LokasiController extends Controller
     public function index()
     {
         $lokasi = Lokasi::select('id', 'kodesp', 'namasp', 'keterangan')
+            ->whereIn('is_deleted',0)
              ->paginate(10);
         return view('admin.pages.datmas.lokasi.index', compact('lokasi'));
     }

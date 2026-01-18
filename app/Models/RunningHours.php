@@ -16,7 +16,8 @@ class RunningHours extends Model
         'sd_jam',
         'jumlah_jam',
         'keterangan',
-        'downtime_jam'
+        'downtime_jam',
+        'is_deleted'
     ];
 
     protected  $casts = [

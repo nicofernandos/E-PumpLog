@@ -332,8 +332,8 @@
             text: "Semua data input per jam akan hilang!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#ED4337',
             confirmButtonText: 'Ya, Hapus!',
             cancelButtonText: 'Batal'
         }).then((result) => {

@@ -226,23 +226,29 @@ class ReportController extends Controller
             DB::beginTransaction();
 
             $report = LaporanHarian::findOrFail($id);
-            $report->detilJam()->delete();
-            
-            if(method_exists($report, 'runningHours')) {
-                $report->runningHours()->delete();
-            }
 
-            $report->delete();
+            // soft delete relasi detail jam
+            $report->detilJam()->update(['is_deleted' => 1]);
+            if (method_exists($report, 'runningHours')) {
+                $report->runningHours()->update(['is_deleted' => 1]);
+            }
+            $report->update([
+                'is_deleted' => 1
+            ]);
 
             DB::commit();
+
             Alert::success('Success', 'Laporan berhasil dihapus.');
             return redirect()->route('admin.reports.index');
+
         } catch (\Exception $e) {
             DB::rollBack();
+
             Alert::error('Error', 'Gagal menghapus laporan: ' . $e->getMessage());
             return redirect()->route('admin.reports.index');
         }
     }
+
 
     public function exportExcel(Request $request)
     {
@@ -311,7 +317,8 @@ class ReportController extends Controller
             'detilJam',
             'approvedBy:id,name,email'
         ])
-        ->where('status', 'approved'); // Only approved reports
+        ->where('is_deleted',0)
+        ->whereIn('status', 'approved'); // Only approved reports
 
         // Apply search filter
         if ($search) {

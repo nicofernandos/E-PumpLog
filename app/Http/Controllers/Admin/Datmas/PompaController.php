@@ -18,10 +18,12 @@ class PompaController extends Controller
     {
         $pompa = Pompa::with(['lokasi:id,kodesp,namasp']) 
             ->select('id', 'kodepompa', 'jenispompa', 'kapasitas', 'lokasi_id', 'status')
+            ->where('is_deleted', 0)
             ->latest()
             ->paginate(10);
             
         $lokasi = Lokasi::select('id', 'kodesp', 'namasp')
+            ->where('is_deleted', 0)
             ->orderBy('kodesp', 'asc')
             ->get();
             
@@ -149,9 +151,10 @@ class PompaController extends Controller
             DB::beginTransaction();
             
             $kodepompa = $pompa->kodepompa;
-            
-            // Hapus data
-            $pompa->delete();
+
+            $pompa->update([
+                'is_deleted' => 1
+            ]);
             
             DB::commit();
 
