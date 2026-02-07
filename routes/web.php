@@ -64,6 +64,9 @@ Route::prefix('admin')->as('admin.')->group(function () {
         Route::patch('/{id}/approve', [AdminReportController::class,'approve'])->name('approve');
         Route::patch('/{id}/rejected', [AdminReportController::class,'reject'])->name('reject');
         Route::get('/{id}/print', [AdminReportController::class,'print'])->name('print');
+
+        Route::delete('/{id}', [AdminReportController::class,'destroy'])->name('destroy');
+
     });
 
 

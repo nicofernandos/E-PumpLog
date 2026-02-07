@@ -9,6 +9,7 @@ use App\Models\LaporanHarian;
 use App\Models\Lokasi;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ReportController extends Controller
@@ -27,8 +28,11 @@ class ReportController extends Controller
             'user:id,name,email',
             'pompa:id,kodepompa,jenispompa,lokasi_id',
             'pompa.lokasi:id,kodesp,namasp',
-            'detilJam'
+            'detilJam' => function ($q) {
+                $q->where('is_deleted',0);
+            }
         ])
+        ->where('is_deleted',0)
         ->whereIn('status', ['draft', 'finalized', 'verified','approved']); // Exclude drafts
 
         // Search filter
@@ -36,13 +40,16 @@ class ReportController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('injeksi_ke', 'like', "%{$search}%")
                 ->orWhereHas('pompa', function($q2) use ($search) {
-                    $q2->where('kodepompa', 'like', "%{$search}%");
+                    $q2->where('kodepompa', 'like', "%{$search}%")
+                        ->where('is_deleted',0);
                 })
                 ->orWhereHas('pompa.lokasi', function($q3) use ($search) {
-                    $q3->where('namasp', 'like', "%{$search}%");
+                    $q3->where('namasp', 'like', "%{$search}%")
+                        ->where('is_deleted',0);
                 })
                 ->orWhereHas('user', function($q4) use ($search) {
-                    $q4->where('name', 'like', "%{$search}%");
+                    $q4->where('name', 'like', "%{$search}%")
+                        ->where('is_deleted',0);
                 });
             });
         }
@@ -81,16 +88,21 @@ class ReportController extends Controller
 
         // Lokasi list
         $lokasi = Lokasi::select('id', 'kodesp', 'namasp')
+                        ->where('is_deleted', 0)
                         ->orderBy('namasp')
                         ->get();
 
         // Statistics
-        $totalReports = LaporanHarian::whereIn('status', ['submitted', 'approved', 'rejected'])->count();
-        $reportsToday = LaporanHarian::whereIn('status', ['submitted', 'approved', 'rejected'])
+        $totalReports = LaporanHarian::where('is_deleted',0)
+        ->whereIn('status', ['submitted', 'approved', 'rejected'])->count();
+        $reportsToday = LaporanHarian::where('is_deleted',0)
+                                    ->whereIn('status', ['submitted', 'approved', 'rejected'])
                                     ->whereDate('tanggal', Carbon::today())
                                     ->count();
-        $pendingApproval = LaporanHarian::whereIn('status', ['submitted', 'pending'])->count();
-        $reportsThisMonth = LaporanHarian::whereIn('status', ['submitted', 'approved', 'rejected'])
+        $pendingApproval = LaporanHarian::where('is_deleted',0)
+                                    ->whereIn('status', ['submitted', 'pending'])->count();
+        $reportsThisMonth = LaporanHarian::where('is_deleted',0)
+                                        ->whereIn('status', ['submitted', 'approved', 'rejected'])
                                         ->whereYear('tanggal', Carbon::now()->year)
                                         ->whereMonth('tanggal', Carbon::now()->month)
                                         ->count();

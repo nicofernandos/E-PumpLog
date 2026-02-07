@@ -7,6 +7,7 @@ use App\Models\Lokasi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class PompaController extends Controller
@@ -39,7 +40,11 @@ class PompaController extends Controller
             DB::beginTransaction();
             
             $validateData = $request->validate([
-                'kodepompa' => 'required|string|max:50|unique:pompa,kodepompa',
+                'kodepompa' => [
+                    'required', Rule::unique('pompa','kodepompa')->where(function($q) {
+                        return $q->where('is_deleted', 0);
+                    })
+                ],
                 'jenispompa' => 'required|string|max:100',
                 'kapasitas' => 'nullable|string|max:50', 
                 'lokasi_id' => 'required|exists:lokasisp,id',
@@ -64,9 +69,15 @@ class PompaController extends Controller
             $lokasi = Lokasi::find($validateData['lokasi_id']);
             $namaLokasi = $lokasi ? $lokasi->namasp : '-';
             
-            Alert::success('Berhasil!', 
-                'Pompa <strong>' . e($validateData['kodepompa']) . '</strong> jenis <strong>' . e($validateData['jenispompa']) . '</strong> pada lokasi <strong>' . e($namaLokasi) . '</strong> berhasil ditambahkan.'
-            )->html();
+            Alert::success(
+                'Berhasil!', 
+                'Pompa <strong>' . e($validateData['kodepompa']) . '</strong> jenis <strong>' .
+                e($validateData['jenispompa']) . '</strong> pada lokasi <strong>' .
+                e($namaLokasi) . '</strong> berhasil ditambahkan.'
+            )
+            ->showConfirmButton(false)
+            ->autoClose(3000);
+
             
             return redirect()->route('admin.pompa.index');
             
@@ -157,9 +168,14 @@ class PompaController extends Controller
             ]);
             
             DB::commit();
-
-            Alert::success('Berhasil!', 'Data pompa <strong>' . e($kodepompa) . '</strong> berhasil dihapus.')->html();
             
+            Alert::success(
+                'Berhasil!',
+                'Data pompa ' . e($kodepompa) . 'berhasil dihapus.'
+            )
+            ->html();
+
+
             return redirect()->route('admin.pompa.index');
 
         } catch (\Throwable $e) {
