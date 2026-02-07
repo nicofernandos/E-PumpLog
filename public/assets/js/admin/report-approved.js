@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then((response) => {
                     if (!response.ok)
                         throw new Error(
-                            `HTTP error! status: ${response.status}`
+                            `HTTP error! status: ${response.status}`,
                         );
                     return response.json();
                 })
@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td class="text-center">${item.water_cf || "-"}</td>
                         <td class="text-center">${item.freq_hz || "-"}</td>
                     </tr>
-                `
+                `,
                     )
                     .join("");
             } else {
@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td>${ket.keterangan || "-"}</td>
                         <td>${ket.dt_jam || "-"}</td>
                     </tr>
-                `
+                `,
                     )
                     .join("");
             } else {
@@ -339,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const methodInput = document.createElement("input");
         methodInput.setAttribute("type", "hidden");
         methodInput.setAttribute("name", "_method");
-        methodInput.setAttribute("value", "PATCH");
+        methodInput.setAttribute("vadalue", "PATCH");
         form.appendChild(methodInput);
 
         document.body.appendChild(form);

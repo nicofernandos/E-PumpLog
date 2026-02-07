@@ -10,10 +10,8 @@ class Lokasi extends Model
     use HasFactory;
 
     protected $table = 'lokasisp';
-
-    // Sesuaikan dengan nama kolom di database (create_at, update_at)
-    const CREATED_AT = 'create_at';
-    const UPDATED_AT = 'update_at';
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
         'kodesp',
@@ -23,12 +21,12 @@ class Lokasi extends Model
     ];
 
     protected $casts = [
-        'create_at' => 'datetime',
-        'update_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function pompas(){
-        return $this->hasMany(Pompa::class, 'lokasi_id', 'id');
+        return $this->hasMany(Pompa::class, 'lokasi_id');
     }
 
 }

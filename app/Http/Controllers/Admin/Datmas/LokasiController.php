@@ -13,8 +13,9 @@ class LokasiController extends Controller
     public function index()
     {
         $lokasi = Lokasi::select('id', 'kodesp', 'namasp', 'keterangan')
-            ->whereIn('is_deleted',0)
-             ->paginate(10);
+            ->where('is_deleted', 0)
+            ->paginate(10);
+
         return view('admin.pages.datmas.lokasi.index', compact('lokasi'));
     }
 
@@ -74,18 +75,41 @@ class LokasiController extends Controller
         }
     }
 
-    public function destroy(Lokasi $lokasi) // KOREKSI: destory menjadi destroy
+    public function destroy(Lokasi $lokasi)
     {
-        try{
+        try {
             DB::beginTransaction();
-            $lokasi->delete();
+            if ($lokasi->pompas()->where('is_deleted', 0)->exists()) {
+                Alert::warning(
+                    'Gagal!',
+                    'Lokasi SP tidak dapat dihapus karena masih memiliki pompa aktif.'
+                );
+                return redirect()->back();
+            }
+
+            // Soft delete
+            $lokasi->update([
+                'is_deleted' => 1
+            ]);
+
             DB::commit();
-            Alert::success('Success', 'Berhasil Menghapus Lokasi SP: ' . $lokasi->namasp);
-            return redirect()->route('admin.lokasi');
+
+            Alert::success(
+                'Success',
+                'Berhasil menghapus Lokasi SP: ' . $lokasi->namasp
+            );
+
+            return redirect()->route('admin.lokasi.index');
+
         } catch (\Throwable $e) {
             DB::rollBack();
-            Alert::error('Error', 'Gagal menghapus lokasi SP: ' . $e->getMessage());
+
+            Alert::error(
+                'Error',
+                'Gagal menghapus lokasi SP: ' . $e->getMessage()
+            );
+
             return redirect()->back();
-        }  
+        }
     }
 }
