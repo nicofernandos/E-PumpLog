@@ -1,15 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// Admin Controller
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Datmas\LokasiController;
 use App\Http\Controllers\Admin\Datmas\PompaController;
 use App\Http\Controllers\Admin\Report\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Auth\AuthController;
+
+// User Controller 
 use App\Http\Controllers\User\DashboardController as UsersDashboardController; 
 use App\Http\Controllers\User\ReportController as UserReportController;
 use App\Http\Controllers\User\DailyReportController as UserDailyReportController;
+use App\Http\Controllers\User\ProfileController as UserProfileController;
+
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -87,5 +92,12 @@ Route::prefix('user')->as('user.')->middleware(['auth'])->group(function () {
         Route::put('/{id}', [UserDailyReportController::class, 'update'])->name('update');
         Route::patch('/{id}/submit', [UserDailyReportController::class, 'submitDraft'])->name('submit');
         Route::delete('/{id}', [UserDailyReportController::class, 'destroy'])->name('destroy');
+    });
+
+
+    Route::prefix('profile')->name('profile.')->group(function() { 
+        Route::get('/',[UserProfileController::class,'index'])->name('index');
+        Route::put('/update',[UserProfileController::class,'update'])->name('update');
+        Route::put('/password',[UserProfileController::class,'updatePassword'])->name('updatePassword');
     });
 });

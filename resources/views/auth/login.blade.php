@@ -24,16 +24,19 @@
   <style>
     /* Custom Styles for Modern Login */
     .auth-page-wrapper {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      position: relative;
-      overflow: hidden;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url("{{ asset('images/auth/gam.jpg') }}"); 
+        background-size: cover;     
+        background-position: center; 
+        background-repeat: no-repeat;
+        background-attachment: fixed; 
+        position: relative;
+        overflow: hidden;
     }
     
-    /* Animated Background Shapes */
     .auth-page-wrapper::before {
       content: '';
       position: absolute;
@@ -45,43 +48,28 @@
       background-size: 50px 50px;
       animation: backgroundMove 20s linear infinite;
     }
+
+    .auth-page-wrapper::after { 
+      content: '';
+      position: absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height: 100%;
+      background:rgba(0,0,0,0.4);
+      z-index:3;
+    }
+
+    .login-card {
+      position:relative;
+      z-index:2;
+    }
     
     @keyframes backgroundMove {
       0% { transform: translate(0, 0); }
       100% { transform: translate(50px, 50px); }
     }
     
-    /* Floating Shapes */
-    .shape {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-    }
-    
-    .shape-1 {
-      width: 300px;
-      height: 300px;
-      top: -100px;
-      right: -100px;
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    .shape-2 {
-      width: 200px;
-      height: 200px;
-      bottom: -50px;
-      left: -50px;
-      animation: float 8s ease-in-out infinite reverse;
-    }
-    
-    .shape-3 {
-      width: 150px;
-      height: 150px;
-      top: 50%;
-      left: 10%;
-      animation: float 7s ease-in-out infinite;
-    }
     
     @keyframes float {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -90,9 +78,11 @@
     
     /* Login Card Styles */
     .login-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
+      background: 0.8;
+      backdrop-filter: blur(15px);
+      --webkit-backdrop-filter: blur(15px);
       border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       padding: 50px 40px;
       max-width: 450px;
@@ -135,7 +125,7 @@
     .login-title {
       font-size: 28px;
       font-weight: 600;
-      color: #2c2c54;
+      color: #F7FCFE;
       margin-bottom: 10px;
       text-align: center;
     }
@@ -226,7 +216,7 @@
     
     .forgot-link {
       font-size: 14px;
-      color: #667eea;
+      color:  #E41B1E;
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s ease;
@@ -285,9 +275,6 @@
         font-size: 24px;
       }
       
-      .shape-1, .shape-2, .shape-3 {
-        display: none;
-      }
     }
     
     /* Custom Checkbox */
@@ -304,10 +291,6 @@
 
 <body>
   <div class="auth-page-wrapper">
-    <!-- Animated Background Shapes -->
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
     
     <!-- Login Card -->
     <div class="login-card">
@@ -341,7 +324,7 @@
         
         <!-- Email Field -->
         <div class="form-group">
-          <label for="email">Email Address</label>
+          <label for="email" style="color:#F7FCFE">Email Address</label>
           <div class="position-relative">
             <input type="email" 
                    class="form-control @error('email') is-invalid @enderror" 
@@ -360,7 +343,7 @@
         
         <!-- Password Field -->
         <div class="form-group">
-          <label for="password">Password</label>
+          <label style="color:#F7FCFE" for="password">Password</label>
           <div class="position-relative">
             <input type="password" 
                    class="form-control @error('password') is-invalid @enderror" 
