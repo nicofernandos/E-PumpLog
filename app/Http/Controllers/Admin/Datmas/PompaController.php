@@ -68,15 +68,16 @@ class PompaController extends Controller
             
             $lokasi = Lokasi::find($validateData['lokasi_id']);
             $namaLokasi = $lokasi ? $lokasi->namasp : '-';
-            
+         
             Alert::success(
                 'Berhasil!', 
-                'Pompa <strong>' . e($validateData['kodepompa']) . '</strong> jenis <strong>' .
-                e($validateData['jenispompa']) . '</strong> pada lokasi <strong>' .
-                e($namaLokasi) . '</strong> berhasil ditambahkan.'
+                'Pompa <strong>' . htmlspecialchars($validateData['kodepompa'], ENT_QUOTES, 'UTF-8') . '</strong> jenis <strong>' .
+                htmlspecialchars($validateData['jenispompa'], ENT_QUOTES, 'UTF-8') . '</strong> pada lokasi <strong>' .
+                htmlspecialchars($namaLokasi, ENT_QUOTES, 'UTF-8') . '</strong> berhasil ditambahkan.'
             )
+            ->html()
             ->showConfirmButton(false)
-            ->autoClose(3000);
+            ->autoClose(6000);
 
             
             return redirect()->route('admin.pompa.index');

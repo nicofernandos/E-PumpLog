@@ -19,8 +19,9 @@ class ReportController extends Controller
         $data = [
             'title' => 'E-PumpLog | Laporan Harian Injeksi Pompa',
             'subtitle' => 'Laporan Harian Injeksi Pompa Injeksi dan Engine Pompa',
-            'lokasi' => Lokasi::all(), 
-            'pompa' => Pompa::with('lokasi')->get() 
+            'lokasi' => Lokasi::where('is_deleted',0)->get(), 
+            'pompa' => Pompa::with('lokasi')
+            ->where('is_deleted',0) ->get() 
         ];
         
         return view('user.pages.report.index', $data);
@@ -49,7 +50,6 @@ class ReportController extends Controller
                 'flow.*.press_cf' => 'nullable|string',
                 'flow.*.water_cf' => 'nullable|string',
                 'flow.*.freq_hz' => 'nullable|numeric',
-                // ✅ Tambahkan validasi untuk keterangan
                 'keterangan' => 'nullable|array',
                 'keterangan.*.dari_jam' => 'nullable|string',
                 'keterangan.*.sd_jam' => 'nullable|string',
@@ -68,7 +68,6 @@ class ReportController extends Controller
                 }
             }
 
-            // ✅ Convert keterangan array menjadi JSON string atau text
             $keteranganText = '';
             if (!empty($validatedData['keterangan'])) {
                 $keteranganArray = [];
@@ -98,7 +97,7 @@ class ReportController extends Controller
                 'total_cumulative' => $totalCumulative,
                 'operator_siang_id' => $user->id,
                 'operator_malam_id' => null,
-                'keterangan' => $keteranganText, // ✅ Sekarang berupa string
+                'keterangan' => $keteranganText, 
                 'status' => 'draft', 
             ]);
 

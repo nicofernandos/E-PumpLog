@@ -5,7 +5,7 @@
     <li class="nav-item {{ request()->routeIs('user.dashboard.index') ? 'active' : '' }}">
       <a class="nav-link" href="{{ route('user.dashboard.index') }}">
         <i class="mdi mdi-view-dashboard menu-icon"></i>
-        <span class="menu-title">Dashboard Utama</span>
+        <span class="menu-title">Dashboard</span>
       </a>
     </li>
 
@@ -58,8 +58,8 @@
 
     <!-- PENGATURAN AKUN -->
     <li class="nav-item nav-category">Akun</li>
-    <li class="nav-item {{ request()->is('user/profil') ? 'active' : '' }}">
-      <a class="nav-link" href="{{ url('user/profil') }}">
+    <li class="nav-item {{ request()->is('user/profile') ? 'active' : '' }}">
+      <a class="nav-link" href="{{ url('user/profile') }}">
         <i class="menu-icon mdi mdi-account-circle-outline"></i>
         <span class="menu-title">Profil Saya</span>
       </a>
