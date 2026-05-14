@@ -11,8 +11,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendors/simple-line-icons/css/simple-line-icons.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendor.bundle.base.css') }}">
 
-<!-- Plugin css for this page -->
-<link rel="stylesheet" href="{{ asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/vendors/datatables.net-bs4/css/dataTables.bootstrap4.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/js/select.dataTables.min.css') }}">
 
 <!-- inject:css -->
