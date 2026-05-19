@@ -212,10 +212,11 @@
       color: #6c757d;
       cursor: pointer;
       user-select: none;
+      text-decoration: none;
     }
     
     .forgot-link {
-      font-size: 14px;
+      font-size: 13px;
       color:  #E41B1E;
       text-decoration: none;
       font-weight: 500;
@@ -359,8 +360,8 @@
         </div>
         
         <!-- Remember Me & Forgot Password -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div class="form-check">
+        <div class="d-flex justify-content-between align-items-center mb-4 pr-4">
+          <div class="form-check" style="margin-left:25px;">
             <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
             <label class="form-check-label" for="remember">
               Remember me

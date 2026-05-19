@@ -4,7 +4,6 @@
 
 @push('styles')
 <style>
-    /* ===== PROFILE PAGE STYLES ===== */
     .profile-hero {
         background: linear-gradient(135deg, #0d47a1 0%, #1565c0 40%, #0288d1 100%);
         border-radius: 16px;
@@ -408,21 +407,21 @@
                 {{-- Mini Stats --}}
                 <div class="row g-3 mb-4">
                     <div class="col-4">
-                        <div class="stat-mini">
+                        <div class="stat-mini h-6">
                             <div class="stat-num" style="color:#1565c0;">{{ $totalLaporan ?? 0 }}</div>
-                            <div class="stat-label">Laporan</div>
+                            <div class="stat-label h-5" style="font-size: 9px;">Laporan</div>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="stat-mini">
                             <div class="stat-num" style="color:#2e7d32;">{{ $laporanDisetujui ?? 0 }}</div>
-                            <div class="stat-label">Disetujui</div>
+                            <div class="stat-label" style="font-size:9px;">Disetujui</div>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="stat-mini">
                             <div class="stat-num" style="color:#e65100;">{{ $laporanDraft ?? 0 }}</div>
-                            <div class="stat-label">Draft</div>
+                            <div class="stat-label" style="font-size:9px;">Draft</div>
                         </div>
                     </div>
                 </div>

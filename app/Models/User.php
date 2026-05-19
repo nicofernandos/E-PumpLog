@@ -31,6 +31,7 @@ class User extends Authenticatable
         'is_active',
         'created_at',
         'updated_at',
+        'picture',
         
     ];
 

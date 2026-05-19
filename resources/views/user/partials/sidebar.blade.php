@@ -66,11 +66,16 @@
     </li>
 
     <li class="nav-item">
-      <a class="nav-link" href="{{ url('logout') }}">
-        <i class="menu-icon mdi mdi-logout"></i>
-        <span class="menu-title">Logout</span>
+      <a class="nav-link" href="#" 
+        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+          <i class="menu-icon mdi mdi-logout"></i>
+          <span class="menu-title">Logout</span>
       </a>
-    </li>
+  </li>
+
+  <form id="logout-form" action="{{ url('logout') }}" method="POST" class="d-none">
+      @csrf
+  </form>
 
   </ul>
 </nav>

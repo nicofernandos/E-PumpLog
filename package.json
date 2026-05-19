@@ -10,6 +10,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "datatables.net-bs4": "^2.3.8",
         "datatables.net-bs5": "^2.3.4",
         "sweetalert2": "^11.26.3"
     }
