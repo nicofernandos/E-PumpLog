@@ -1,4 +1,4 @@
-<nav class="sidebar sidebar-offcanvas" id="sidebar">
+<nav class="sidebar sidebar-offcanvas b-secondary" id="sidebar">
   <ul class="nav">
     <!-- Dashboard -->
     <li class="nav-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">

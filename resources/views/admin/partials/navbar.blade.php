@@ -87,12 +87,12 @@
                 <div class="dropdown-divider"></div>
                 
                 {{-- Logout --}}
-                {{-- <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                 <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i> Keluar
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                     @csrf
-                </form> --}}
+                </form> 
             </div>
         </li>
     </ul>
