@@ -53,17 +53,28 @@
 
     <ul class="navbar-nav ms-auto">
       <!-- User Profile Dropdown -->
+      @php
+          use Illuminate\Support\Facades\Storage;
+      @endphp
+
       <li class="nav-item dropdown d-none d-lg-block user-dropdown">
-        <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-          <img class="img-xs rounded-circle" src="{{ asset('assets/images/faces/face8.jpg') }}" alt="Profile image">
-        </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
-          <div class="dropdown-header text-center">
-            <img class="img-md rounded-circle" src="{{ asset('images/faces/face8.jpg') }}" alt="Profile image">
+          <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+
+              <img class="img-xs rounded-circle"
+                  src="{{ Auth::user()->picture 
+                      ? Storage::url(Auth::user()->picture) 
+                      : asset('assets/images/default-avatar.png') }}"
+                  alt="Profile image">
+
+          </a>
+
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+
+              <div class="dropdown-header text-center">
             <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name ?? 'User' }}</p>
             <p class="fw-light text-muted mb-0">{{ Auth::user()->email ?? 'user@epumplog.com' }}</p>
           </div>
-          <a class="dropdown-item" href="{{ url('/user/profil') }}">
+          <a class="dropdown-item" href="{{ url('/user/profile') }}">
             <i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> Profil Saya
           </a>
           <a class="dropdown-item" href="{{ url('/user/log-aktivitas') }}">

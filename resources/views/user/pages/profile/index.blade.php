@@ -343,6 +343,37 @@
         padding: 12px 16px;
     }
 
+    /* Avatar Upload */
+    .avatar-upload-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+        cursor: pointer;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 600;
+        gap: 2px;
+    }
+
+    .avatar-upload-overlay i {
+        font-size: 1.1rem;
+    }
+
+    .profile-avatar-wrapper:hover .avatar-upload-overlay {
+        opacity: 1;
+    }
+
+    .profile-avatar-wrapper {
+        cursor: pointer;
+    }
+
     /* Responsive tweaks */
     @media (max-width: 576px) {
         .profile-hero {
@@ -380,15 +411,20 @@
             {{-- Profile Hero Card --}}
             <div class="profile-hero mb-0">
                 <div class="d-flex align-items-center gap-3 position-relative" style="z-index:2;">
-                    <div class="profile-avatar-wrapper">
-                        {{-- Jika ada foto profil: --}}
-                        {{-- <img src="{{ auth()->user()->avatar_url ?? asset('images/default-avatar.png') }}" class="profile-avatar" alt="Avatar"> --}}
-
-                        {{-- Placeholder inisial --}}
-                        <div class="avatar-placeholder">
-                            <span>{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
-                        </div>
+                    <div class="profile-avatar-wrapper" onclick="document.getElementById('pictureInput').click()" title="Klik untuk ganti foto">
+                        @if(auth()->user()->picture)
+                            <img src="{{ Storage::url(auth()->user()->picture) }}"
+                                class="profile-avatar" alt="Avatar" id="avatarPreviewHero">
+                        @else
+                            <div class="avatar-placeholder" id="avatarPlaceholderHero">
+                                <span>{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                            </div>
+                        @endif
                         <div class="avatar-online-dot"></div>
+                        <div class="avatar-upload-overlay">
+                            <i class="bi bi-camera-fill"></i>
+                            Ubah
+                        </div>
                     </div>
                     <div class="profile-hero-text">
                         <h4>{{ auth()->user()->name ?? 'Nama Pengguna' }}</h4>
@@ -517,11 +553,59 @@
                             </div>
                             @endif
 
-                            <form action="{{ route('user.profile.update') }}" method="POST">
+                           <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
 
                                 <p class="section-title">Data Pribadi</p>
+
+                                 {{-- Foto Profil --}}
+                                <div class="mb-4">
+                                    <label class="form-label-custom">Foto Profil</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        {{-- Preview --}}
+                                        <div style="position:relative; display:inline-block;">
+                                            @if(auth()->user()->picture)
+                                                <img src="{{ Storage::url(auth()->user()->picture) }}"
+                                                    id="avatarPreviewForm"
+                                                    style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e3eaf5;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                                            @else
+                                                <div id="avatarPreviewForm"
+                                                    style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1976d2,#0288d1);display:flex;align-items:center;justify-content:center;border:3px solid #e3eaf5;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                                                    <span style="font-size:1.6rem;font-weight:700;color:#fff;">
+                                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                                                    </span>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Tombol & input --}}
+                                        <div>
+                                            <input type="file" name="picture" id="pictureInput" accept="image/jpeg,image/png,image/jpg,image/gif"
+                                                style="display:none;" onchange="previewPicture(event)">
+                                            <button type="button" class="btn btn-outline-custom btn-sm mb-1"
+                                                    onclick="document.getElementById('pictureInput').click()">
+                                                <i class="bi bi-camera-fill me-1"></i> Pilih Foto
+                                            </button>
+                                            @if(auth()->user()->picture)
+                                            <button type="button" class="btn btn-sm d-block"
+                                                    style="border:1.5px solid #fce4ec;color:#c62828;border-radius:8px;font-size:0.8rem;font-weight:600;"
+                                                    onclick="confirmRemovePicture()">
+                                                <i class="bi bi-trash3 me-1"></i> Hapus Foto
+                                            </button>
+                                            @endif
+                                            <small class="text-muted d-block mt-1" style="font-size:0.73rem;">
+                                                <i class="bi bi-info-circle me-1"></i>JPG, PNG, GIF. Maks. 2MB.
+                                            </small>
+                                        </div>
+                                    </div>
+                                    @error('picture')
+                                        <div class="text-danger mt-2" style="font-size:0.8rem;">{{ $message }}</div>
+                                    @enderror
+
+                                    {{-- Hidden field untuk hapus foto --}}
+                                    <input type="hidden" name="remove_picture" id="removePicture" value="0">
+                                </div>
 
                                 <div class="row g-3 mb-4">
                                     <div class="col-12 col-md-6">
@@ -749,6 +833,42 @@
                 matchIndicator.innerHTML = '<span style="color:#e53935;"><i class="bi bi-x-circle-fill me-1"></i>Password tidak cocok</span>';
             }
         });
+    }
+
+    // ===== PREVIEW FOTO PROFIL =====
+    function previewPicture(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const src = e.target.result;
+
+            // Update preview di form
+            const formPreview = document.getElementById('avatarPreviewForm');
+            if (formPreview) {
+                formPreview.outerHTML = `<img src="${src}" id="avatarPreviewForm"
+                    style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e3eaf5;box-shadow:0 2px 8px rgba(0,0,0,0.1);">`;
+            }
+
+            // Update preview di hero (kiri atas)
+            const heroPreview = document.getElementById('avatarPreviewHero');
+            const heroPlaceholder = document.getElementById('avatarPlaceholderHero');
+            if (heroPreview) {
+                heroPreview.src = src;
+            } else if (heroPlaceholder) {
+                heroPlaceholder.outerHTML = `<img src="${src}" class="profile-avatar" id="avatarPreviewHero">`;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ===== KONFIRMASI HAPUS FOTO =====
+    function confirmRemovePicture() {
+        if (confirm('Hapus foto profil? Foto akan diganti dengan inisial nama.')) {
+            document.getElementById('removePicture').value = '1';
+            document.querySelector('form[action*="profile.update"]').submit();
+        }
     }
 </script>
 @endpush

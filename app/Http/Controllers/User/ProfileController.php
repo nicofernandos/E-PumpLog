@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LaporanHarian;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -35,13 +36,29 @@ class ProfileController extends Controller
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|numeric|digits_between:10,15',
+            'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($request->input('remove_picture') == '1' && $user->picture) {
+        Storage::disk('public')->delete($user->picture);
+        $user->picture = null;
+        }
+
+        // Upload foto baru
+        if ($request->hasFile('picture')) {
+            if ($user->picture) {
+                Storage::disk('public')->delete($user->picture);
+            }
+            $user->picture = $request->file('picture')->store('profile_pictures', 'public');
+        }
 
         $user->update([
             'name'  => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
         ]);
+
+        $user->save();
 
         return back()->with('success', 'Profil berhasil diperbarui!');
     }
