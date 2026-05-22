@@ -1,7 +1,6 @@
 @extends('user.layouts.app')
 
-@section('title', 'Draft Laporan Pompa')
-
+@section('title', $title ?? 'Draft Laporan Harian')
 @push('styles')
 <style>
     .table td {
@@ -339,7 +338,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
-                form.action = `/user/dailyreport/${draftId}`;
+                form.action = `dailyreport/${draftId}`;
                 form.method = 'POST';
                 form.style.display = 'none';
 

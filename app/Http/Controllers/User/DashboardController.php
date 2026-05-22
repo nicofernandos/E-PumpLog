@@ -9,6 +9,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-         return view('user.pages.dashboard');
+         return view('user.pages.dashboard',
+         [
+            'title' => 'E-PumpLog - Dashboard',
+         ]);
     }
 }

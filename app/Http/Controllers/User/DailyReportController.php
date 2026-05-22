@@ -36,7 +36,7 @@ class DailyReportController extends Controller
         $lokasi = Lokasi::all();
 
         $data = [
-            'title' => 'E-PumpLog | Draft Harian Injeksi Pompa',
+            'title' => 'E-PumpLog | Draft Report',
             'drafts' => $drafts,
             'totalDraft' => $totalDraft,
             'draftToday' => $draftToday,

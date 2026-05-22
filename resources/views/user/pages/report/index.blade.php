@@ -1,7 +1,7 @@
 {{-- View File: resources/views/user/laporan/create.blade.php --}}
 @extends('user.layouts.app')
 
-@section('title', 'Laporan Harian Injeksi Pompa')
+@section('title', $title ?? $subtitle)
 
 @push('styles')
 <style>

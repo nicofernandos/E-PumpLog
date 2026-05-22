@@ -14,17 +14,86 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = LaporanHarian::query();
+
+        // hanya laporan milik user login
+        $query->where('user_id', auth()->id());
+
+        // filter status
+        if ($request->status == 'approved') {
+            $query->where('status_code', 3);
+        }
+
+        if ($request->status == 'revision') {
+            $query->where('status_code', 2);
+        }
+
+        if ($request->status == 'submitted') {
+            $query->where('status_code', 1);
+        }
+
+        $reports = $query->latest()->paginate(10);
+
         $data = [
-            'title' => 'E-PumpLog | Laporan Harian Injeksi Pompa',
-            'subtitle' => 'Laporan Harian Injeksi Pompa Injeksi dan Engine Pompa',
-            'lokasi' => Lokasi::where('is_deleted',0)->get(), 
+            'title' => 'E-PumpLog | Report',
+            'subtitle' => 'E-PumpLog | Report',
+
+            'reports' => $reports,
+
+            'lokasi' => Lokasi::where('is_deleted',0)->get(),
+
             'pompa' => Pompa::with('lokasi')
-            ->where('is_deleted',0) ->get() 
+                ->where('is_deleted',0)
+                ->get()
         ];
-        
+
         return view('user.pages.report.index', $data);
+    }
+
+    public function list(Request $request)
+    {
+        $userId = auth()->id();
+
+        // Base query hanya milik user login
+        $query = LaporanHarian::where('user_id', $userId);
+
+        // Filter status
+        $statusFilter = [
+            'draft'     => 0,
+            'submitted' => 1,
+            'revision'  => 2,
+            'approved'  => 3,
+            'rejected'  => 4,
+        ];
+
+        if ($request->status && isset($statusFilter[$request->status])) {
+            $query->where('status_code', $statusFilter[$request->status]);
+        }
+
+        $reports = $query->with(['lokasi', 'pompa'])->latest()->paginate(10);
+
+        // Statistik — tidak terpengaruh filter aktif
+        $base = LaporanHarian::where('user_id', $userId);
+
+        $data = [
+            'title'    => 'E-PumpLog | Report',
+            'subtitle' => 'E-PumpLog | Report',
+
+            'reports'        => $reports,
+            'totalAll'       => (clone $base)->count(),
+            'totalDraft'     => (clone $base)->where('status_code', 0)->count(),
+            'totalSubmitted' => (clone $base)->where('status_code', 1)->count(),
+            'totalRevision'  => (clone $base)->where('status_code', 2)->count(),
+            'totalApproved'  => (clone $base)->where('status_code', 3)->count(),
+            'totalRejected'  => (clone $base)->where('status_code', 4)->count(),
+
+            'lokasi' => Lokasi::where('is_deleted', 0)->get(),
+            'pompa'  => Pompa::with('lokasi')->where('is_deleted', 0)->get(),
+        ];
+
+        return view('user.pages.report.list', $data);
     }
 
     public function store(Request $request)
