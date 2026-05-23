@@ -23,40 +23,23 @@
         font-size: 28px;
         color: white;
     }
-    .bg-primary-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    .bg-success-gradient {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    }
-    .bg-warning-gradient {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    .bg-info-gradient {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-    .bg-danger-gradient {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    }
-    .stat-card {
-        border: none;
-        border-left: 4px solid;
-    }
-    .stat-card.primary {
-        border-left-color: #667eea;
-    }
-    .stat-card.success {
-        border-left-color: #38ef7d;
-    }
-    .stat-card.warning {
-        border-left-color: #f5576c;
-    }
-    .stat-card.info {
-        border-left-color: #00f2fe;
-    }
-    .stat-card.danger {
-        border-left-color: #fa709a;
-    }
+    .bg-primary-gradient   { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .bg-success-gradient   { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    .bg-warning-gradient   { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .bg-info-gradient      { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .bg-danger-gradient    { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .bg-orange-gradient    { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+
+    .stat-card { border: none; border-left: 4px solid; }
+    .stat-card.primary { border-left-color: #667eea; }
+    .stat-card.success { border-left-color: #38ef7d; }
+    .stat-card.warning { border-left-color: #f5576c; }
+    .stat-card.info    { border-left-color: #00f2fe; }
+    .stat-card.danger  { border-left-color: #fa709a; }
+    .stat-card.orange  { border-left-color: #fda085; }
+
+    .quick-card { cursor: pointer; }
+    .quick-card .card-icon { margin: 0 auto; }
 </style>
 @endpush
 
@@ -77,11 +60,16 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="text-white mb-2">Selamat Datang, {{ Auth::user()->name ?? 'User' }}!</h4>
-                        <p class="mb-0 opacity-75">Sistem Monitoring Pompa Air - {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</p>
+                        <h4 class="text-white mb-2">
+                            Selamat Datang, {{ Auth::user()->name ?? 'User' }}!
+                        </h4>
+                        <p class="mb-0 opacity-75">
+                            Sistem Monitoring Injeksi Pompa &mdash;
+                            {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
+                        </p>
                     </div>
                     <div>
-                        <i class="ti-user" style="font-size: 48px; opacity: 0.5;"></i>
+                        <i class="mdi mdi-account-circle" style="font-size: 64px; opacity: 0.4;"></i>
                     </div>
                 </div>
             </div>
@@ -89,9 +77,8 @@
     </div>
 </div>
 
-{{-- Statistics Cards --}}
+{{-- ===== STATISTIK POMPA & LOKASI ===== --}}
 <div class="row">
-    {{-- Total Pompa --}}
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card stat-card primary">
             <div class="card-body">
@@ -102,14 +89,13 @@
                         <small class="text-muted">Unit Pompa</small>
                     </div>
                     <div class="card-icon bg-primary-gradient">
-                        <i class="ti-settings"></i>
+                        <i class="mdi mdi-engine"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Pompa Aktif --}}
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card stat-card success">
             <div class="card-body">
@@ -120,14 +106,13 @@
                         <small class="text-muted">Sedang Beroperasi</small>
                     </div>
                     <div class="card-icon bg-success-gradient">
-                        <i class="ti-check-box"></i>
+                        <i class="mdi mdi-check-circle"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Pompa Non-Aktif --}}
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card stat-card warning">
             <div class="card-body">
@@ -138,14 +123,13 @@
                         <small class="text-muted">Tidak Beroperasi</small>
                     </div>
                     <div class="card-icon bg-warning-gradient">
-                        <i class="ti-close"></i>
+                        <i class="mdi mdi-close-circle"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Total Lokasi SP --}}
     <div class="col-md-6 col-xl-3 mb-4">
         <div class="card stat-card info">
             <div class="card-body">
@@ -156,7 +140,7 @@
                         <small class="text-muted">Stasiun Pompa</small>
                     </div>
                     <div class="card-icon bg-info-gradient">
-                        <i class="ti-location-pin"></i>
+                        <i class="mdi mdi-map-marker"></i>
                     </div>
                 </div>
             </div>
@@ -164,36 +148,70 @@
     </div>
 </div>
 
-{{-- Log Activity Today --}}
+{{-- ===== STATISTIK LAPORAN USER ===== --}}
 <div class="row">
-    <div class="col-md-6 mb-4">
+    <div class="col-md-6 col-xl-3 mb-4">
         <div class="card stat-card danger">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2">Log Hari Ini</h6>
+                        <h6 class="text-muted mb-2">Laporan Hari Ini</h6>
                         <h2 class="mb-0 fw-bold">{{ $logHariIni ?? 0 }}</h2>
-                        <small class="text-muted">Aktivitas Tercatat</small>
+                        <small class="text-muted">{{ \Carbon\Carbon::now()->format('d/m/Y') }}</small>
                     </div>
                     <div class="card-icon bg-danger-gradient">
-                        <i class="ti-clipboard"></i>
+                        <i class="mdi mdi-clipboard-text"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6 mb-4">
+    <div class="col-md-6 col-xl-3 mb-4">
         <div class="card stat-card primary">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2">Total Log</h6>
+                        <h6 class="text-muted mb-2">Total Laporan</h6>
                         <h2 class="mb-0 fw-bold">{{ $totalLog ?? 0 }}</h2>
-                        <small class="text-muted">Semua Aktivitas</small>
+                        <small class="text-muted">Semua Laporan Saya</small>
                     </div>
                     <div class="card-icon bg-primary-gradient">
-                        <i class="ti-archive"></i>
+                        <i class="mdi mdi-document"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card stat-card orange">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Menunggu Approval</h6>
+                        <h2 class="mb-0 fw-bold text-warning">{{ $totalSubmitted ?? 0 }}</h2>
+                        <small class="text-muted">Laporan Disubmit</small>
+                    </div>
+                    <div class="card-icon bg-orange-gradient">
+                        <i class="mdi mdi-clock-outline"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3 mb-4">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Disetujui</h6>
+                        <h2 class="mb-0 fw-bold text-success">{{ $totalApproved ?? 0 }}</h2>
+                        <small class="text-muted">Laporan Approved</small>
+                    </div>
+                    <div class="card-icon bg-success-gradient">
+                        <i class="mdi mdi-check-decagram"></i>
                     </div>
                 </div>
             </div>
@@ -201,94 +219,115 @@
     </div>
 </div>
 
-{{-- Quick Access Cards --}}
-<div class="row">
-    <div class="col-12 mb-3">
-        <h4 class="mb-3">Menu Cepat</h4>
+{{-- ===== MENU CEPAT ===== --}}
+<div class="row mb-2">
+    <div class="col-12">
+        <h5 class="mb-3 fw-semibold">Menu Cepat</h5>
     </div>
 
     <div class="col-md-4 mb-4">
-        <a href="" class="text-decoration-none">
-            <div class="card">
+        <a href="{{ route('user.report.index') }}" class="text-decoration-none">
+            <div class="card quick-card">
                 <div class="card-body text-center py-4">
-                    <div class="card-icon bg-primary-gradient mx-auto mb-3">
-                        <i class="ti-settings"></i>
+                    <div class="card-icon bg-primary-gradient mb-3">
+                        <i class="mdi mdi-plus-circle"></i>
                     </div>
-                    <h5 class="card-title mb-2">Data Pompa</h5>
-                    <p class="text-muted small mb-0">Lihat daftar semua pompa</p>
+                    <h5 class="card-title mb-1">Input Laporan</h5>
+                    <p class="text-muted small mb-0">Buat laporan harian baru</p>
                 </div>
             </div>
         </a>
     </div>
 
     <div class="col-md-4 mb-4">
-        <a href="" class="text-decoration-none">
-            <div class="card">
+        <a href="{{ route('user.dailyreport.index') }}" class="text-decoration-none">
+            <div class="card quick-card">
                 <div class="card-body text-center py-4">
-                    <div class="card-icon bg-success-gradient mx-auto mb-3">
-                        <i class="ti-clipboard"></i>
+                    <div class="card-icon bg-warning-gradient mb-3">
+                        <i class="mdi mdi-book"></i>
                     </div>
-                    <h5 class="card-title mb-2">Log Aktivitas</h5>
-                    <p class="text-muted small mb-0">Catat aktivitas pompa</p>
+                    <h5 class="card-title mb-1">Draft Laporan</h5>
+                    <p class="text-muted small mb-0">Lanjutkan draft yang tersimpan</p>
                 </div>
             </div>
         </a>
     </div>
 
     <div class="col-md-4 mb-4">
-        <a href="" class="text-decoration-none">
-            <div class="card">
+        <a href="{{ route('user.report.list') }}" class="text-decoration-none">
+            <div class="card quick-card">
                 <div class="card-body text-center py-4">
-                    <div class="card-icon bg-info-gradient mx-auto mb-3">
-                        <i class="ti-location-pin"></i>
+                    <div class="card-icon bg-success-gradient mb-3">
+                        <i class="mdi mdi-format-list-bulleted"></i>
                     </div>
-                    <h5 class="card-title mb-2">Lokasi SP</h5>
-                    <p class="text-muted small mb-0">Lihat stasiun pompa</p>
+                    <h5 class="card-title mb-1">Semua Laporan</h5>
+                    <p class="text-muted small mb-0">Lihat riwayat laporan saya</p>
                 </div>
             </div>
         </a>
     </div>
 </div>
 
-{{-- Recent Activity --}}
+{{-- ===== LAPORAN TERBARU ===== --}}
 @if(isset($recentLogs) && count($recentLogs) > 0)
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="card-title mb-0">Aktivitas Terbaru</h4>
-                    <a href="" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                    <h5 class="card-title mb-0">Laporan Terbaru</h5>
+                    <a href="{{ route('user.report.list') }}" 
+                       class="btn btn-sm btn-outline-primary">
+                        Lihat Semua
+                    </a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th width="15%">Tanggal</th>
-                                <th width="15%">Kode Pompa</th>
-                                <th width="20%">Lokasi</th>
-                                <th width="15%">Status</th>
-                                <th width="35%">Keterangan</th>
+                                <th>Tanggal</th>
+                                <th>Kode Pompa</th>
+                                <th>Lokasi SP</th>
+                                <th>Injeksi Ke</th>
+                                <th>Status</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($recentLogs as $log)
                             <tr>
-                                <td>{{ \Carbon\Carbon::parse($log->tanggal)->format('d/m/Y') }}</td>
                                 <td>
-                                    <span class="badge badge-info">{{ $log->pompa->kodepompa ?? '-' }}</span>
+                                    {{ \Carbon\Carbon::parse($log->tanggal)->format('d/m/Y') }}
+                                    <small class="d-block text-muted">
+                                        {{ $log->created_at->diffForHumans() }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-white">
+                                        {{ $log->pompa->kodepompa ?? '-' }}
+                                    </span>
                                 </td>
                                 <td>{{ $log->pompa->lokasi->namasp ?? '-' }}</td>
+                                <td>{{ $log->injeksi_ke ?? '-' }}</td>
                                 <td>
-                                    @if($log->status == 'berjalan')
-                                        <span class="badge badge-success">Berjalan</span>
-                                    @elseif($log->status == 'mati')
-                                        <span class="badge badge-danger">Mati</span>
-                                    @else
-                                        <span class="badge badge-warning">Maintenance</span>
-                                    @endif
+                                    @php
+                                        $statusMap = [
+                                            0 => ['label' => 'Draft',     'class' => 'bg-secondary text-dark'],
+                                            1 => ['label' => 'Submitted', 'class' => 'bg-warning text-dark'],
+                                            2 => ['label' => 'Revisi',    'class' => 'bg-warning text-dark'],
+                                            3 => ['label' => 'Approved',  'class' => 'bg-success'],
+                                            4 => ['label' => 'Rejected',  'class' => 'bg-danger'],
+                                        ];
+                                        $st = $statusMap[$log->status_code] 
+                                              ?? ['label' => '-', 'class' => 'bg-secondary'];
+                                    @endphp
+                                    <span class="badge {{ $st['class'] }}">
+                                        {{ $st['label'] }}
+                                    </span>
                                 </td>
-                                <td>{{ \Illuminate\Support\Str::limit($log->keterangan ?? '-', 50) }}</td>
+                                <td>
+                                    {{ \Illuminate\Support\Str::limit($log->keterangan ?? '-', 40) }}
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

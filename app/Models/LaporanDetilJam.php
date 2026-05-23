@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LaporanDetilJam extends Model
 {
     use HasFactory;
+
     protected $table = 'laporan_detil_jam';
 
     protected $fillable = [
@@ -19,29 +20,30 @@ class LaporanDetilJam extends Model
         'rate_hari',
         'inj_psi',
         'inj_rpm',
-        'oli_cf',
+        'oil_cf',     // Fix Bug #4: was 'oli_cf'
         'press_cf',
         'water_cf',
         'freq_hz',
-        'is_deleted'
+        'is_deleted',
     ];
 
     protected $casts = [
-        'jam_ke' => 'integer',
+        'jam_ke'     => 'integer',
         'total_bbls' => 'float',
-        'rate_jam' => 'float',
-        'cumm_bbls' => 'float',
-        'rate_hari' => 'float',
-        'inj_psi' => 'float',
-        'inj_rpm' => 'float',
-        'oli_cf' => 'float',
-        'press_cf' => 'float',
-        'water_cf' => 'float',
-        'freq_hz' => 'float',
+        'rate_jam'   => 'float',
+        'cumm_bbls'  => 'float',
+        'rate_hari'  => 'float',
+        'inj_psi'    => 'float',
+        'inj_rpm'    => 'float',
+        'oil_cf'     => 'float',  // Fix Bug #5: was 'oli_cf'
+        'press_cf'   => 'float',
+        'water_cf'   => 'float',
+        'freq_hz'    => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     public function laporan()
     {
-        return $this->belongsTo(LaporanHarian::class,'laporan_id');
+        return $this->belongsTo(LaporanHarian::class, 'laporan_id');
     }
 }

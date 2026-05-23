@@ -392,18 +392,33 @@
                     </div>
 
                     {{-- Submit Buttons --}}
-                    <div class="d-flex justify-content-between">
-                        <a href="" class="btn btn-light">
-                            <i class="mdi mdi-arrow-left me-1"></i> Kembali
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <a href="" class="btn btn-danger shadow-sm">
+                            Kembali
                         </a>
+
                         <div>
-                            <button type="button" onclick="window.location.href=''" class="btn btn-secondary me-2">
-                                <i class="mdi mdi-close me-1"></i> Batal
+
+                            <button
+                                type="button"
+                                onclick="window.location.href=''"
+                               class="btn btn-light border border-secondary me-2 shadow-sm">
+                                Batal
+
                             </button>
-                            <button type="submit" name="action" value="submit" class="btn btn-primary">
-                                <i class="mdi mdi-send me-1"></i> Simpan Laporan
+
+                            <button
+                                type="submit"
+                                name="action"
+                                value="submit"
+                                class="btn btn-primary border border-primary shadow-sm">
+                                Simpan Laporan
+
                             </button>
+
                         </div>
+
                     </div>
                 </form>
             </div>

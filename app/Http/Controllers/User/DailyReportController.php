@@ -89,77 +89,89 @@ class DailyReportController extends Controller
         DB::beginTransaction();
         try {
             $validatedData = $request->validate([
-                'lokasi_id' => 'required|exists:lokasisp,id',
-                'pompa_id' => 'required|exists:pompa,id',
-                'tanggal' => 'required|date',
-                'injector_well' => 'required|string|max:50',
-                'flow' => 'nullable|array',
-                'flow.*.total_bbls' => 'nullable|numeric',
-                'flow.*.rate_jam' => 'nullable|numeric',
-                'flow.*.cumm' => 'nullable|numeric',
-                'flow.*.rate_hari' => 'nullable|numeric',
+                'lokasi_id'          => 'required|exists:lokasisp,id',
+                'pompa_id'           => 'required|exists:pompa,id',
+                'tanggal'            => 'required|date',
+                'injeksi_ke'         => 'required|string|max:50',
+                'flow'               => 'nullable|array',
+                'flow.*.total_bbls'  => 'nullable|numeric',
+                'flow.*.rate_jam'    => 'nullable|numeric',
+                'flow.*.cumm'        => 'nullable|numeric',
+                'flow.*.rate_hari'   => 'nullable|numeric',
                 'flow.*.injeksi_psi' => 'nullable|numeric',
-                'flow.*.rpm' => 'nullable|numeric',
-                'flow.*.oil_cf' => 'nullable|string',
-                'flow.*.press_cf' => 'nullable|string',
-                'flow.*.water_cf' => 'nullable|string',
-                'flow.*.freq_hz' => 'nullable|numeric',
+                'flow.*.rpm'         => 'nullable|numeric',
+                'flow.*.oil_cf'      => 'nullable|string',
+                'flow.*.press_cf'    => 'nullable|string',
+                'flow.*.water_cf'    => 'nullable|string',
+                'flow.*.freq_hz'     => 'nullable|numeric',
             ]);
 
-            // Hitung total cumulative
+            // Hitung total cumulative (ambil nilai cumm tertinggi)
             $totalCumulative = 0;
             if (!empty($validatedData['flow'])) {
-                foreach ($validatedData['flow'] as $flowData) {
-                    if (isset($flowData['cumm'])) {
-                        $totalCumulative += $flowData['cumm'];
+                foreach ($validatedData['flow'] as $flowItem) {
+                    if (!empty($flowItem['cumm'])) {
+                        $totalCumulative = max($totalCumulative, $flowItem['cumm']);
                     }
                 }
             }
 
-            // Update header
+            // Update header laporan
             $laporan->update([
-                'lokasisp_id' => $validatedData['lokasi_id'],
-                'pompa_id' => $validatedData['pompa_id'],
-                'tanggal' => $validatedData['tanggal'],
-                'injeksi_ke' => $validatedData['injector_well'],
+                'lokasisp_id'      => $validatedData['lokasi_id'],
+                'pompa_id'         => $validatedData['pompa_id'],
+                'tanggal'          => $validatedData['tanggal'],
+                'injeksi_ke'       => $validatedData['injeksi_ke'],
                 'total_cumulative' => $totalCumulative,
-                'keterangan' => $request->input('keterangan', ''),
+                'keterangan'       => $request->input('keterangan', ''),
             ]);
 
             // Update/Insert detail jam
             if (!empty($validatedData['flow'])) {
-                foreach ($validatedData['flow'] as $jamKe => $flowData) {
-                    if (empty(array_filter($flowData))) continue;
+                foreach ($validatedData['flow'] as $jamKe => $flowItem) {
+
+                    // skip baris kosong
+                    $temp = $flowItem;
+                    unset($temp['waktu']);
+                    $values = array_filter($temp, fn($v) => $v !== null && $v !== '');
+                    if (empty($values)) continue;
 
                     $laporan->detilJam()->updateOrCreate(
                         ['jam_ke' => $jamKe],
                         [
-                            'total_bbls' => $flowData['total_bbls'] ?? null,
-                            'rate_jam' => $flowData['rate_jam'] ?? null,
-                            'cumm_bbls' => $flowData['cumm'] ?? null,
-                            'rate_hari' => $flowData['rate_hari'] ?? null,
-                            'inj_psi' => $flowData['injeksi_psi'] ?? null,
-                            'inj_rpm' => $flowData['rpm'] ?? null,
-                            'oil_cf' => $flowData['oil_cf'] ?? null,
-                            'press_cf' => $flowData['press_cf'] ?? null,
-                            'water_cf' => $flowData['water_cf'] ?? null,
-                            'freq_hz' => $flowData['freq_hz'] ?? null,
+                            'total_bbls' => $flowItem['total_bbls']  ?? null,
+                            'rate_jam'   => $flowItem['rate_jam']    ?? null,
+                            'cumm_bbls'  => $flowItem['cumm']        ?? null,
+                            'rate_hari'  => $flowItem['rate_hari']   ?? null,
+                            'inj_psi'    => $flowItem['injeksi_psi'] ?? null,
+                            'inj_rpm'    => $flowItem['rpm']         ?? null,
+                            'oil_cf'     => $flowItem['oil_cf']      ?? null,
+                            'press_cf'   => $flowItem['press_cf']    ?? null,
+                            'water_cf'   => $flowItem['water_cf']    ?? null,
+                            'freq_hz'    => $flowItem['freq_hz']     ?? null,
                         ]
                     );
                 }
             }
 
-            // Cek action: submit atau draft
+            // Cek action: submit atau simpan draft
             if ($request->input('action') === 'submit') {
-                $laporan->update(['status' => 'finalized']);
+                $laporan->update([
+                    'status'      => 'submitted',
+                    'status_code' => 1,
+                ]);
                 DB::commit();
                 Alert::success('Success', 'Laporan berhasil disubmit!');
-                return redirect()->route('user.report.final');
+                return redirect()->route('user.dailyreport.index');
             }
 
             DB::commit();
-            Alert::success('Success', 'Draft berhasil diupdate!');
+            Alert::success('Success', 'Draft berhasil disimpan!');
             return redirect()->route('user.dailyreport.index');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($e->errors())->withInput();
 
         } catch (\Exception $e) {
             DB::rollBack();

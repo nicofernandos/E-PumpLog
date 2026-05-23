@@ -11,50 +11,48 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LaporanHarianExport;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
-    {   
-        // Get filter inputs
-        $search = $request->input('search');
+    {
+        // ── Filter inputs ─────────────────────────────────────────
+        $search   = $request->input('search');
         $dateFrom = $request->input('date_from');
-        $dateTo = $request->input('date_to');
+        $dateTo   = $request->input('date_to');
         $lokasiId = $request->input('lokasi_id');
-        $status = $request->input('status');
+        $status   = $request->input('status');
 
-        // Query builder with eager loading
+        // ── Query utama dengan eager loading ──────────────────────
         $query = LaporanHarian::with([
             'user:id,name,email',
             'pompa:id,kodepompa,jenispompa,lokasi_id',
             'pompa.lokasi:id,kodesp,namasp',
-            'detilJam' => function ($q) {
-                $q->where('is_deleted',0);
-            }
+            'detilJam' => fn($q) => $q->where('is_deleted', 0)->orderBy('jam_ke'),
         ])
-        ->where('is_deleted',0)
-        ->whereIn('status', ['draft', 'finalized', 'verified','approved']); // Exclude drafts
+        ->where('is_deleted', 0);
 
-        // Search filter
+        // ── Filter pencarian ──────────────────────────────────────
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('injeksi_ke', 'like', "%{$search}%")
-                ->orWhereHas('pompa', function($q2) use ($search) {
-                    $q2->where('kodepompa', 'like', "%{$search}%")
-                        ->where('is_deleted',0);
-                })
-                ->orWhereHas('pompa.lokasi', function($q3) use ($search) {
-                    $q3->where('namasp', 'like', "%{$search}%")
-                        ->where('is_deleted',0);
-                })
-                ->orWhereHas('user', function($q4) use ($search) {
-                    $q4->where('name', 'like', "%{$search}%")
-                        ->where('is_deleted',0);
-                });
+                ->orWhereHas('pompa', fn($q2) =>
+                        $q2->where('kodepompa', 'like', "%{$search}%")
+                        ->where('is_deleted', 0)
+                )
+                ->orWhereHas('pompa.lokasi', fn($q3) =>
+                        $q3->where('namasp', 'like', "%{$search}%")
+                        ->where('is_deleted', 0)
+                )
+                ->orWhereHas('user', fn($q4) =>
+                        $q4->where('name', 'like', "%{$search}%")
+                );
             });
         }
 
-        // Date range
+        // ── Filter tanggal ────────────────────────────────────────
         if ($dateFrom && $dateTo) {
             $query->whereBetween('tanggal', [$dateFrom, $dateTo]);
         } elseif ($dateFrom) {
@@ -63,52 +61,69 @@ class ReportController extends Controller
             $query->whereDate('tanggal', '<=', $dateTo);
         }
 
-        // Lokasi filter
+        // ── Filter lokasi — pakai kolom lokasisp_id di laporan_harian ──
         if ($lokasiId) {
             $query->where('lokasisp_id', $lokasiId);
         }
 
-        // Status filter
-        if ($status) {
+        // ── Filter status — sesuai enum DB ────────────────────────
+        $validStatuses = ['draft', 'finalized', 'verified', 'approved'];
+        if ($status && in_array($status, $validStatuses)) {
             $query->where('status', $status);
         }
 
-        // Order by latest
-        $query->orderBy('tanggal', 'desc')
-            ->orderBy('created_at', 'desc');
+        // ── Urutan ────────────────────────────────────────────────
+        $query->orderBy('tanggal', 'desc')->orderBy('created_at', 'desc');
 
-        // Pagination
+        // ── Pagination ────────────────────────────────────────────
         $reports = $query->paginate(15)->withQueryString();
 
-        // Hourly entries count
+        // Hitung jumlah entry per laporan (sudah eager loaded, no extra query)
         $reports->getCollection()->transform(function ($report) {
             $report->hourly_entries_count = $report->detilJam->count();
             return $report;
         });
 
-        // Lokasi list
+        // ── Dropdown lokasi ───────────────────────────────────────
         $lokasi = Lokasi::select('id', 'kodesp', 'namasp')
                         ->where('is_deleted', 0)
                         ->orderBy('namasp')
                         ->get();
 
-        // Statistics
-        $totalReports = LaporanHarian::where('is_deleted',0)
-        ->whereIn('status', ['submitted', 'approved', 'rejected'])->count();
-        $reportsToday = LaporanHarian::where('is_deleted',0)
-                                    ->whereIn('status', ['submitted', 'approved', 'rejected'])
-                                    ->whereDate('tanggal', Carbon::today())
-                                    ->count();
-        $pendingApproval = LaporanHarian::where('is_deleted',0)
-                                    ->whereIn('status', ['submitted', 'pending'])->count();
-        $reportsThisMonth = LaporanHarian::where('is_deleted',0)
-                                        ->whereIn('status', ['submitted', 'approved', 'rejected'])
-                                        ->whereYear('tanggal', Carbon::now()->year)
-                                        ->whereMonth('tanggal', Carbon::now()->month)
-                                        ->count();
+        // ── Statistik cards — FIX: pakai enum yang benar ─────────
+        $baseQuery = fn() => LaporanHarian::where('is_deleted', 0);
 
-        // Title + Subtitle
-        $title = 'E-PumpLog | Laporan Harian Injeksi Pompa';
+        // Total semua laporan (semua status kecuali soft-delete)
+        $totalReports = $baseQuery()->count();
+
+        // Laporan hari ini (tanggal == hari ini, semua status)
+        $reportsToday = $baseQuery()
+            ->whereDate('tanggal', Carbon::today())
+            ->count();
+
+        // Menunggu approval = status 'verified' (sudah disubmit, belum di-approve admin)
+        $pendingApproval = $baseQuery()
+            ->where('status', 'verified')
+            ->count();
+
+        // Laporan bulan ini
+        $reportsThisMonth = $baseQuery()
+            ->whereYear('tanggal', Carbon::now()->year)
+            ->whereMonth('tanggal', Carbon::now()->month)
+            ->count();
+
+        // Draft hari ini
+        $reportsDraftToday = $baseQuery()
+            ->where('status', 'draft')
+            ->whereDate('tanggal', Carbon::today())
+            ->count();
+
+        // Verified hari ini (sudah disubmit user, menunggu admin)
+        $reportsVerifiedToday = $baseQuery()
+            ->where('status', 'verified')
+            ->whereDate('tanggal', Carbon::today())
+            ->count();
+        $title    = 'E-PumpLog | Laporan Harian Injeksi Pompa';
         $subtitle = 'Laporan Harian Injeksi Pompa Injeksi dan Engine Pompa';
 
         return view('admin.pages.report.index', compact(
@@ -118,6 +133,8 @@ class ReportController extends Controller
             'reportsToday',
             'pendingApproval',
             'reportsThisMonth',
+            'reportsDraftToday',
+            'reportsVerifiedToday',
             'title',
             'subtitle'
         ));
@@ -261,15 +278,16 @@ class ReportController extends Controller
         }
     }
 
-
     public function exportExcel(Request $request)
     {
-        return redirect()->back()->with('info', 'Fitur ekspor Excel sedang dalam pengembangan.');
-    }
+        $filename = 'laporan-harian-injeksi-pompa-'
+                . now()->format('Y-m-d-His')
+                . '.xlsx';
 
-    public function exportPdf(Request $request)
-    {
-        return redirect()->back()->with('info', 'Fitur ekspor PDF sedang dalam pengembangan.');
+        return Excel::download(
+            new LaporanHarianExport($request->all()),
+            $filename
+        );
     }
 
     public function print($id)
